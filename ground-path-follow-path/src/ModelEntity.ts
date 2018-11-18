@@ -1,6 +1,6 @@
 const Cesium = require('cesium/Cesium');
 
-const defaultPosition = new Cesium.Cartesian3(0,0,0);
+const defaultPosition = new Cesium.Cartesian3(1000,1000,1000);
 
 export class ModelEntity {
     position: Cesium.Cartesian3;
@@ -14,7 +14,7 @@ export class ModelEntity {
 
         const model = new Cesium.ModelGraphics({
             color: new Cesium.ConstantProperty(Cesium.Color.WHITE),
-            minimumPixelSize : 30,
+            minimumPixelSize : 32,
             maximumScale : 2000,
             uri: url,
         });
