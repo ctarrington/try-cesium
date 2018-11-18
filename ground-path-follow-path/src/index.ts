@@ -32,17 +32,33 @@ let direction = 1;
 let offset = 0;
 const step = 0.00001;
 
-setInterval(()=> {
-    ctr++;
+const positions : Cesium.Cartographic[] = [];
+for (let pctr=0; pctr<2000;pctr++) {
+  ctr++;
 
-    if (ctr > 50) {
-        direction = -direction;
-        ctr = 0;
+  if (ctr > 50) {
+    direction = -direction;
+    ctr = 0;
+  }
+  offset += direction*step;
+  const position = Cesium.Cartographic.fromDegrees(-79+offset, 44);
+  positions.push(position);
+}
+
+var promise = Cesium.sampleTerrainMostDetailed(terrainProvider, positions);
+Cesium.when(promise, function(updatedCartographicPositions:Cesium.Cartographic[]) {
+  let pctr = 0;
+  setInterval(()=> {
+    const cartographic = updatedCartographicPositions[pctr];
+    const cartesian = Cesium.Cartographic.toCartesian(cartographic);
+    milkTruck.update(cartesian);
+    pctr++;
+    if (pctr >= positions.length) {
+      pctr = 0;
     }
-    offset += direction*step;
-    const position = Cesium.Cartesian3.fromDegrees(-79+offset, 44, 300);
-    milkTruck.update(position);
-}, 200);
+  }, 200);
+
+});
 
 
 
