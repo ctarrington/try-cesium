@@ -7,15 +7,16 @@ export class ModelEntity {
     previousPosition: Cesium.Cartesian3;
     orientation: Cesium.Quaternion;
 
-    constructor(viewer:Cesium.Viewer, url: string, position: Cesium.Cartesian3 = defaultPosition) {
+    constructor(viewer:Cesium.Viewer, url: string, position: Cesium.Cartesian3 = defaultPosition,
+                color: Cesium.Color = Cesium.Color.WHITE, minimumPixelSize: number = 32) {
         this.position = position;
         this.previousPosition = null;
         this.orientation = Cesium.Transforms.headingPitchRollQuaternion(this.position, new Cesium.HeadingPitchRoll(0, 0, 0));
 
         const model = new Cesium.ModelGraphics({
-            color: new Cesium.ConstantProperty(Cesium.Color.WHITE),
-            minimumPixelSize : 32,
-            maximumScale : 2000,
+            color: new Cesium.ConstantProperty(color),
+            minimumPixelSize,
+            maximumScale : 20000,
             uri: url,
         });
 

@@ -8,7 +8,7 @@ type WayPoint = {
 };
 
 const generateCartographicGroundPath : PathProvider = (terrainProvider : Cesium.TerrainProvider, waypoints:WayPoint[]) => {
-  const step = 0.0000003;
+  const step = 0.00000005;
 
   const positions : Cesium.Cartographic[] = [];
   for (let wctr=0;wctr < waypoints.length-1; wctr++) {
