@@ -5,22 +5,21 @@ require('cesium/Widgets/widgets.css');
 require('./main.css');
 
 import {ModelEntity} from './ModelEntity';
+import {PursuitCamera} from './PursuitCamera';
+
 import {generateCartographicGroundPath} from './CartographicGroundPath';
 import {generateAirPursuitPath} from './AirPursuitPath';
 
-var terrainProvider = Cesium.createWorldTerrain();
-var viewer = new Cesium.Viewer('cesiumContainer', {
+const terrainProvider = Cesium.createWorldTerrain();
+const viewer = new Cesium.Viewer('cesiumContainer', {
     terrainProvider : terrainProvider
 });
 
 const FPS = 33;
 
-const scene = viewer.scene;
-const camera = viewer.camera;
+const {canvas, camera, scene} = viewer;
 
-camera.flyTo({
-    destination : Cesium.Cartesian3.fromDegrees(-86.2891374, 40.3293046, 900.0)
-});
+const aspectRatio = canvas.clientWidth / canvas.clientHeight;
 
 //new Cesium.CesiumInspector('inspector', scene);
 
@@ -30,23 +29,25 @@ const pursuitPlane = new ModelEntity(viewer, 'assets/Cesium_Air.glb', new Cesium
 
 
 const waypoints = [
-  {position: Cesium.Cartographic.fromDegrees(-86.2891374, 40.3293046), speed: 27},
-  {position: Cesium.Cartographic.fromDegrees(-86.295118, 40.356107), speed: 27},
-  {position: Cesium.Cartographic.fromDegrees(-86.295118, 40.356107), speed: 27},
-  {position: Cesium.Cartographic.fromDegrees(-86.295118, 40.336107), speed: 27},
-  {position: Cesium.Cartographic.fromDegrees(-86.2891374, 40.336107), speed: 27},
-];  // Chicago near the aquarium
+    {position:Cesium.Cartographic.fromDegrees(-115.654969, 32.773781), speed: 27},
+    {position:Cesium.Cartographic.fromDegrees(-115.663605, 32.773777), speed: 27},
+    {position:Cesium.Cartographic.fromDegrees(-115.663647, 32.782038), speed: 27},
+    {position:Cesium.Cartographic.fromDegrees(-115.680752, 32.782039), speed: 27},
+];
 
-// const initialPursuitPosition = Cesium.Cartesian3.fromDegrees(-86.2891374, 40.3293046, 400); // over
-// const initialPursuitPosition = Cesium.Cartesian3.fromDegrees(-86.2891374, 40.335, 200);  // ahead
-const initialPursuitPosition = Cesium.Cartesian3.fromDegrees(-86.2891374, 40.325, 400);  // behind
+camera.flyTo({
+    destination : Cesium.Cartesian3.fromDegrees(-115.654969, 32.773781, 1200.0)
+});
+
+const initialPursuitPosition = Cesium.Cartesian3.fromDegrees(-115.654969, 32.773781, 400.0);
 
 const pathPromise = generateCartographicGroundPath(terrainProvider, waypoints);
 
 Cesium.when(pathPromise, function(updatedCartographicPositions:Cesium.Cartographic[]) {
 
   console.log('about to generate air path');
-  const pursuitCartesianPositions = generateAirPursuitPath(updatedCartographicPositions, initialPursuitPosition, 60, 300,400);
+  const pursuitCartesianPositions = generateAirPursuitPath(updatedCartographicPositions, initialPursuitPosition, 70, 300,400);
+  const pursuitCamera = new PursuitCamera(camera);
 
   let pctr = 0;
   setInterval(()=> {
@@ -54,7 +55,8 @@ Cesium.when(pathPromise, function(updatedCartographicPositions:Cesium.Cartograph
     const cartesian = Cesium.Cartographic.toCartesian(cartographic);
 
     milkTruck.update(cartesian);
-    pursuitPlane.update(pursuitCartesianPositions[pctr]);
+    //pursuitPlane.update(pursuitCartesianPositions[pctr]);
+    pursuitCamera.update(cartesian, pursuitCartesianPositions[pctr]);
 
     pctr++;
     if (pctr >= updatedCartographicPositions.length) {
