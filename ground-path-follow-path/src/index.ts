@@ -19,8 +19,6 @@ const FPS = 33;
 
 const {canvas, camera, scene} = viewer;
 
-const aspectRatio = canvas.clientWidth / canvas.clientHeight;
-
 //new Cesium.CesiumInspector('inspector', scene);
 
 
@@ -39,15 +37,14 @@ camera.flyTo({
     destination : Cesium.Cartesian3.fromDegrees(-115.654969, 32.773781, 1200.0)
 });
 
-const initialPursuitPosition = Cesium.Cartesian3.fromDegrees(-115.654969, 32.773781, 400.0);
+const initialPursuitPosition = Cesium.Cartesian3.fromDegrees(-115.654969, 32.77377, 400.0);
 
 const pathPromise = generateCartographicGroundPath(terrainProvider, waypoints);
 
 Cesium.when(pathPromise, function(updatedCartographicPositions:Cesium.Cartographic[]) {
 
-  console.log('about to generate air path');
-  const pursuitCartesianPositions = generateAirPursuitPath(updatedCartographicPositions, initialPursuitPosition, 70, 300,400);
-  const pursuitCamera = new PursuitCamera(camera);
+  const pursuitCartesianPositions = generateAirPursuitPath(updatedCartographicPositions, initialPursuitPosition, 40, 200,300);
+  const pursuitCamera = new PursuitCamera(viewer);
 
   let pctr = 0;
   setInterval(()=> {
@@ -55,7 +52,7 @@ Cesium.when(pathPromise, function(updatedCartographicPositions:Cesium.Cartograph
     const cartesian = Cesium.Cartographic.toCartesian(cartographic);
 
     milkTruck.update(cartesian);
-    //pursuitPlane.update(pursuitCartesianPositions[pctr]);
+    pursuitPlane.update(pursuitCartesianPositions[pctr]);
     pursuitCamera.update(cartesian, pursuitCartesianPositions[pctr]);
 
     pctr++;
@@ -63,6 +60,17 @@ Cesium.when(pathPromise, function(updatedCartographicPositions:Cesium.Cartograph
       pctr = 0;
     }
   }, 33);
+
+  let pursuitEnabled = false;
+  setInterval(()=>{
+      if (!pursuitEnabled) {
+          pursuitCamera.enable();
+          pursuitEnabled = true;
+      } else {
+          pursuitCamera.disable();
+          pursuitEnabled = false;
+      }
+  }, 5000);
 
 });
 

@@ -1,43 +1,66 @@
 const Cesium = require('cesium/Cesium');
 
+import {calculateBearing} from "./calculations";
+
 export class PursuitCamera {
     camera: Cesium.Camera;
+    enabled: boolean;
+    disabledFrustrum: Cesium.PerspectiveFrustum;
+    enabledFrustrum: Cesium.PerspectiveFrustum;
 
-    constructor(camera: Cesium.Camera) {
-        this.camera = camera;
+    constructor(viewer: Cesium.Viewer, enabled:boolean = false) {
+        this.camera = viewer.camera;
+        this.enabled = enabled;
+
+        const aspectRatio = viewer.canvas.clientWidth / viewer.canvas.clientHeight;
+
+        this.disabledFrustrum = new Cesium.PerspectiveFrustum({
+            fov: Math.PI/4,
+            aspectRatio,
+        });
+
+        this.enabledFrustrum = new Cesium.PerspectiveFrustum({
+            fov: Math.PI/20,
+            aspectRatio,
+        });
+
+        if (enabled) {
+            this.camera.frustum = this.enabledFrustrum;
+        }
+
+    }
+
+    enable() {
+        this.enabled = true;
+        this.camera.frustum = this.enabledFrustrum;
+    }
+
+    disable() {
+        this.enabled = false;
+        this.camera.frustum = this.disabledFrustrum;
+
     }
 
     update(targetCartesian: Cesium.Cartesian3, pursuitCartesian: Cesium.Cartesian3) {
-        const targetCartographic = new Cesium.Cartographic(0,0,0);
-        Cesium.Cartographic.fromCartesian(targetCartesian, Cesium.Ellipsoid.WGS84, targetCartographic);
+        if (!this.enabled) { return; }
 
-        const pursuitCartographic = new Cesium.Cartographic(0,0,0);
-        Cesium.Cartographic.fromCartesian(pursuitCartesian, Cesium.Ellipsoid.WGS84, pursuitCartographic);
+        const targetCartographic = Cesium.Cartographic.fromCartesian(targetCartesian);
+        const pursuitCartographic = Cesium.Cartographic.fromCartesian(pursuitCartesian);
+        const raisedTargetCartographic = new Cesium.Cartographic(targetCartographic.longitude, targetCartographic.latitude, pursuitCartographic.height);
+        const raisedTargetCartesian = Cesium.Cartographic.toCartesian(raisedTargetCartographic);
 
-        const targetRaisedCartographic = new Cesium.Cartographic(targetCartographic.longitude,targetCartographic.latitude, pursuitCartographic.height);
-        const targetRaisedCartesian = new Cesium.Cartesian3(0,0,0);
-        Cesium.Cartographic.toCartesian(targetRaisedCartographic, Cesium.Ellipsoid.WGS84, targetRaisedCartesian);
+        const fromPursuitToTarget = Cesium.Cartesian3.subtract(targetCartesian, pursuitCartesian, new Cesium.Cartesian3(0,0,0));
+        const fromPursuitToRaisedTarget = Cesium.Cartesian3.subtract(raisedTargetCartesian, pursuitCartesian, new Cesium.Cartesian3(0,0,0));
 
-        // https://www.movable-type.co.uk/scripts/latlong.html
-        const lon1 = pursuitCartographic.longitude;
-        const lat1 = pursuitCartographic.latitude;
-
-        const lon2 = targetCartographic.longitude;
-        const lat2 = targetCartographic.latitude;
-
-        const y = Math.sin(lon2-lon1) * Math.cos(lat2);
-        const x = Math.cos(lat1)*Math.sin(lat2) -
-            Math.sin(lat1)*Math.cos(lat2)*Math.cos(lon2-lon1);
-        const bearing = Math.atan2(y, x);
-
-        const pitch = Cesium.Cartesian3.angleBetween(targetCartesian, targetRaisedCartesian);
+        const bearing = calculateBearing(pursuitCartographic, targetCartographic);
+        const pitch = Cesium.Cartesian3.angleBetween(fromPursuitToTarget, fromPursuitToRaisedTarget);
 
         this.camera.setView({
             destination : pursuitCartesian,
             orientation: {
                 heading : bearing,
-                pitch : -pitch-Math.PI/5,
-                roll : 0.0
+                pitch : -pitch,
+                roll : 0.0,
             }
         });
     }
