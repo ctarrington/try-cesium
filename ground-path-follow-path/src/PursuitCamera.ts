@@ -1,5 +1,13 @@
 const Cesium = require('cesium/Cesium');
 
+import {
+    raiseCartesian,
+    raiseCartographic,
+    subtractCartesians,
+    subtractCartographics,
+    toCartesian,
+    toCartographic
+} from './cesium-helpers';
 import {calculateBearing} from "./calculations";
 
 export class PursuitCamera {
@@ -44,13 +52,12 @@ export class PursuitCamera {
     update(targetCartesian: Cesium.Cartesian3, pursuitCartesian: Cesium.Cartesian3) {
         if (!this.enabled) { return; }
 
-        const targetCartographic = Cesium.Cartographic.fromCartesian(targetCartesian);
-        const pursuitCartographic = Cesium.Cartographic.fromCartesian(pursuitCartesian);
-        const raisedTargetCartographic = new Cesium.Cartographic(targetCartographic.longitude, targetCartographic.latitude, pursuitCartographic.height);
-        const raisedTargetCartesian = Cesium.Cartographic.toCartesian(raisedTargetCartographic);
+        const targetCartographic = toCartographic(targetCartesian);
+        const pursuitCartographic = toCartographic(pursuitCartesian);
+        const raisedTargetCartesian = raiseCartesian(targetCartesian, pursuitCartographic.height);
 
-        const fromPursuitToTarget = Cesium.Cartesian3.subtract(targetCartesian, pursuitCartesian, new Cesium.Cartesian3(0,0,0));
-        const fromPursuitToRaisedTarget = Cesium.Cartesian3.subtract(raisedTargetCartesian, pursuitCartesian, new Cesium.Cartesian3(0,0,0));
+        const fromPursuitToTarget = subtractCartesians(targetCartesian, pursuitCartesian);
+        const fromPursuitToRaisedTarget = subtractCartesians(raisedTargetCartesian, pursuitCartesian);
 
         const bearing = calculateBearing(pursuitCartographic, targetCartographic);
         const pitch = Cesium.Cartesian3.angleBetween(fromPursuitToTarget, fromPursuitToRaisedTarget);
