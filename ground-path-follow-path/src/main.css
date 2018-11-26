@@ -8,3 +8,9 @@ div#cesiumContainer {
     height: 100%;
     overflow: hidden;
 }
+
+div#button-bar {
+    position:absolute;
+    top: 10px;
+    left: 10px;
+}
