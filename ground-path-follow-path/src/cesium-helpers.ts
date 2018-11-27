@@ -41,5 +41,10 @@ const cross = (first: Cesium.Cartesian3, second: Cesium.Cartesian3) : Cesium.Car
     return Cesium.Cartesian3.cross(first, second, new Cesium.Cartesian3(0,0,0));
 };
 
+const terrainCartesianFromScreen = (viewer: Cesium.Viewer, screen: Cesium.Cartesian2) =>
+{
+    const ray = viewer.camera.getPickRay(screen);
+    return viewer.scene.globe.pick(ray, viewer.scene);
+}
 
-export {addCartesians, cross, multiplyByScalar, normalize, raiseCartesian, raiseCartographic, subtractCartesians, subtractCartographics, toCartesian, toCartographic};
+export {addCartesians, cross, multiplyByScalar, normalize, raiseCartesian, raiseCartographic, subtractCartesians, subtractCartographics, terrainCartesianFromScreen, toCartesian, toCartographic};

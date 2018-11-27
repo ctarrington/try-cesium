@@ -1,25 +1,30 @@
 import {CylinderEntity} from "./CylinderEntity";
+import {VideoRecorder} from './VideoRecorder';
 
 const Cesium = require('cesium/Cesium');
-
-const createMarker = (viewer: Cesium.Viewer, color:Cesium.Color) => {
-    return new CylinderEntity(viewer, 10, color, 4, 0);
-}
 
 import {
     raiseCartesian,
     raiseCartographic,
     subtractCartesians,
     subtractCartographics,
+    terrainCartesianFromScreen,
     toCartesian,
     toCartographic
 } from './cesium-helpers';
-import {calculateBearing} from "./calculations";
+import {calculateBearing} from './calculations';
+import {DataRecorder} from './DataRecorder';
 
+const createMarker = (viewer: Cesium.Viewer, color:Cesium.Color) => {
+    return new CylinderEntity(viewer, 10, color, 4, 0);
+};
 
 export class PursuitCamera {
     viewer: Cesium.Viewer;
     camera: Cesium.Camera;
+    videoRecorder: VideoRecorder;
+    recording: boolean;
+    recordedData:any;
     enabled: boolean;
     disabledFrustrum: Cesium.PerspectiveFrustum;
     enabledFrustrum: Cesium.PerspectiveFrustum;
@@ -28,12 +33,13 @@ export class PursuitCamera {
     bottomRightMarker: CylinderEntity;
     bottomLeftMarker: CylinderEntity;
 
-
-
     constructor(viewer: Cesium.Viewer, enabled:boolean = false) {
         this.viewer = viewer;
         this.camera = viewer.camera;
         this.enabled = enabled;
+        this.videoRecorder = new VideoRecorder(viewer.canvas);
+        this.recording = false;
+        this.recordedData = [];
 
         const aspectRatio = viewer.canvas.clientWidth / viewer.canvas.clientHeight;
 
@@ -55,7 +61,6 @@ export class PursuitCamera {
         this.topRightMarker = createMarker(viewer, Cesium.Color.GREEN);
         this.bottomRightMarker = createMarker(viewer, Cesium.Color.BLUE);
         this.bottomLeftMarker = createMarker(viewer, Cesium.Color.YELLOW);
-
     }
 
     enable() {
@@ -66,7 +71,6 @@ export class PursuitCamera {
     disable() {
         this.enabled = false;
         this.camera.frustum = this.disabledFrustrum;
-
     }
 
     update(targetCartesian: Cesium.Cartesian3, pursuitCartesian: Cesium.Cartesian3) {
@@ -91,12 +95,46 @@ export class PursuitCamera {
             }
         });
 
-        this.topLeftMarker.update(this.camera.pickEllipsoid(new Cesium.Cartesian2(0,0)));
-        this.topRightMarker.update(this.camera.pickEllipsoid(new Cesium.Cartesian2(this.viewer.canvas.clientWidth,0)));
-        this.bottomRightMarker.update(this.camera.pickEllipsoid(new Cesium.Cartesian2(this.viewer.canvas.clientWidth,this.viewer.canvas.clientHeight)));
-        this.bottomLeftMarker.update(this.camera.pickEllipsoid(new Cesium.Cartesian2(0,this.viewer.canvas.clientHeight)));
+        const topLeftCartesian = terrainCartesianFromScreen(this.viewer, new Cesium.Cartesian2(0,0));
+        const topRightCartesian = terrainCartesianFromScreen(this.viewer, new Cesium.Cartesian2(this.viewer.canvas.clientWidth,0));
+        const bottomRightCartesian = terrainCartesianFromScreen(this.viewer, new Cesium.Cartesian2(this.viewer.canvas.clientWidth,this.viewer.canvas.clientHeight));
+        const bottomLeftCartesian = terrainCartesianFromScreen(this.viewer, new Cesium.Cartesian2(0,this.viewer.canvas.clientHeight));
 
+        this.topLeftMarker.update(topLeftCartesian);
+        this.topRightMarker.update(topRightCartesian);
+        this.bottomRightMarker.update(bottomRightCartesian);
+        this.bottomLeftMarker.update(bottomLeftCartesian);
 
+        const datum = {
+            target: targetCartesian,
+            camera: pursuitCartesian,
+            video: {
+                topLeft: topLeftCartesian,
+                topRight: topRightCartesian,
+                bottomRight: bottomRightCartesian,
+                bottomLeft: bottomLeftCartesian,
+            }
+        };
+
+        this.recordedData.push(datum);
     }
+
+    startRecording() {
+        this.videoRecorder.startRecording();
+        this.recording = true;
+    }
+
+    stopRecording() {
+        this.videoRecorder.stopRecording();
+        this.recording = false;
+    }
+
+    download() {
+        this.videoRecorder.downloadVideo();
+        const dataRecorder = new DataRecorder();
+        dataRecorder.downloadData(this.recordedData);
+    }
+
+
 
 }

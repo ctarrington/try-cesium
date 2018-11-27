@@ -12,7 +12,6 @@ import {generateCartographicGroundPath} from './CartographicGroundPath';
 import {generateAirPursuitPath} from './AirPursuitPath';
 import {VelocityOrientedBillboard} from './VelocityOrientedBillboard';
 import {ButtonBar} from './ButtonBar';
-import {VideoRecorder} from './VideoRecorder';
 
 const terrainProvider = Cesium.createWorldTerrain();
 const viewer = new Cesium.Viewer('cesiumContainer', {
@@ -22,11 +21,9 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
 const pursuitCamera = new PursuitCamera(viewer);
 
 
-const FPS = 33;
+const FPS = 30;
 
 const {canvas, camera, scene} = viewer;
-
-const videoRecorder = new VideoRecorder(canvas);
 
 //new Cesium.CesiumInspector('inspector', scene);
 
@@ -59,11 +56,11 @@ buttonBar.addToggle<boolean>(
     [false, true],
     (value) => {
         if (value) {
-            videoRecorder.startRecording();
+            pursuitCamera.startRecording();
         } else {
-            videoRecorder.stopRecording();
+            pursuitCamera.stopRecording();
             buttonBar.addButton('Download', ()=>{
-                videoRecorder.downloadVideo();
+                pursuitCamera.download();
             })
         }
     }
@@ -125,7 +122,7 @@ Cesium.when(pathPromise, function(updatedCartographicPositions:Cesium.Cartograph
     if (pctr >= updatedCartographicPositions.length-1) {
       pctr = 0;
     }
-  }, 33);
+  }, 1000/FPS);
 
 });
 
