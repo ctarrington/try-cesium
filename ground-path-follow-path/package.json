@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@types/cesium": "^1.47.3",
+    "@types/dom-mediacapture-record": "^1.0.0",
     "@types/node": "^10.11.7"
   }
 }

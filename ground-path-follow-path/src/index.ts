@@ -10,8 +10,9 @@ import {PursuitCamera} from './PursuitCamera';
 
 import {generateCartographicGroundPath} from './CartographicGroundPath';
 import {generateAirPursuitPath} from './AirPursuitPath';
-import {VelocityOrientedBillboard} from "./VelocityOrientedBillboard";
-import {ButtonBar} from "./ButtonBar";
+import {VelocityOrientedBillboard} from './VelocityOrientedBillboard';
+import {ButtonBar} from './ButtonBar';
+import {VideoRecorder} from './VideoRecorder';
 
 const terrainProvider = Cesium.createWorldTerrain();
 const viewer = new Cesium.Viewer('cesiumContainer', {
@@ -24,6 +25,8 @@ const pursuitCamera = new PursuitCamera(viewer);
 const FPS = 33;
 
 const {canvas, camera, scene} = viewer;
+
+const videoRecorder = new VideoRecorder(canvas);
 
 //new Cesium.CesiumInspector('inspector', scene);
 
@@ -47,6 +50,21 @@ buttonBar.addToggle<boolean>(
             pursuitCamera.enable();
         } else {
             pursuitCamera.disable();
+        }
+    }
+);
+
+buttonBar.addToggle<boolean>(
+    ['Record', 'Stop'],
+    [false, true],
+    (value) => {
+        if (value) {
+            videoRecorder.startRecording();
+        } else {
+            videoRecorder.stopRecording();
+            buttonBar.addButton('Download', ()=>{
+                videoRecorder.downloadVideo();
+            })
         }
     }
 );

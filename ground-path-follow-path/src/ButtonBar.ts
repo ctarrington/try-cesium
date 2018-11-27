@@ -21,9 +21,20 @@ export class ButtonBar {
 
             button.innerText = labels[index];
             callback(values[index]);
-        }
+        };
 
 
+        this.barDiv.appendChild(button);
+    }
+
+    addButton(label:string, callback:()=>void) {
+        const button = document.createElement('button');
+        button.value = '0';
+        button.innerText = label;
+
+        button.onclick = () => {
+            callback();
+        };
         this.barDiv.appendChild(button);
     }
 
