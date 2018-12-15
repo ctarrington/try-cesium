@@ -7,15 +7,14 @@ const encode = (s:string) => {
 };
 
 export class DataRecorder {
-    downloadData(raw:any) {
-        const str = JSON.stringify(raw);
-        const data = encode(str);
-        const blob = new Blob([data], {type: 'application/json'});
+    downloadData(filename:string, raw:string) {
+        const data = encode(raw);
+        const blob = new Blob([data], {type: 'application/text'});
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
-        a.download = 'recordedData.json';
+        a.download = filename;
         document.body.appendChild(a);
         a.click();
         setTimeout(() => {

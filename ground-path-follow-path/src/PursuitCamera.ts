@@ -32,6 +32,7 @@ export class PursuitCamera {
     topRightMarker: CylinderEntity;
     bottomRightMarker: CylinderEntity;
     bottomLeftMarker: CylinderEntity;
+    startMilliseconds: number;
 
     constructor(viewer: Cesium.Viewer, enabled:boolean = false) {
         this.viewer = viewer;
@@ -55,6 +56,7 @@ export class PursuitCamera {
 
         if (enabled) {
             this.camera.frustum = this.enabledFrustrum;
+            this.startMilliseconds = Date.now();
         }
 
         this.topLeftMarker = createMarker(viewer, Cesium.Color.RED);
@@ -66,6 +68,7 @@ export class PursuitCamera {
     enable() {
         this.enabled = true;
         this.camera.frustum = this.enabledFrustrum;
+        this.startMilliseconds = this.startMilliseconds || Date.now();
     }
 
     disable() {
@@ -116,7 +119,22 @@ export class PursuitCamera {
             }
         };
 
-        this.recordedData.push(datum);
+        const topLeftCartographic = toCartographic(topLeftCartesian);
+        const topRightCartographic = toCartographic(topRightCartesian);
+        const bottomRightCartographic = toCartographic(bottomRightCartesian);
+        const bottomLeftCartographic = toCartographic(bottomLeftCartesian);
+
+        const elapsedMilliseconds = Date.now() - this.startMilliseconds;
+
+        const line =
+            `${elapsedMilliseconds},`+
+            `${topLeftCartographic.latitude},${topLeftCartographic.longitude},${topLeftCartographic.height},'t',`+
+            `${topRightCartographic.latitude},${topRightCartographic.longitude},${topRightCartographic.height},'t',`+
+            `${bottomRightCartographic.latitude},${bottomRightCartographic.longitude},${bottomRightCartographic.height},'t',`+
+            `${bottomLeftCartographic.latitude},${bottomLeftCartographic.longitude},${bottomLeftCartographic.height},'t',` +
+            `${pursuitCartographic.latitude},${pursuitCartographic.longitude},${pursuitCartographic.height}`;
+
+        this.recordedData.push(line);
     }
 
     startRecording() {
@@ -132,9 +150,6 @@ export class PursuitCamera {
     download() {
         this.videoRecorder.downloadVideo();
         const dataRecorder = new DataRecorder();
-        dataRecorder.downloadData(this.recordedData);
+        dataRecorder.downloadData('recordedData.csv', this.recordedData.join('\n'));
     }
-
-
-
 }
