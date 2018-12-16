@@ -103,35 +103,32 @@ export class PursuitCamera {
         const bottomRightCartesian = terrainCartesianFromScreen(this.viewer, new Cesium.Cartesian2(this.viewer.canvas.clientWidth,this.viewer.canvas.clientHeight));
         const bottomLeftCartesian = terrainCartesianFromScreen(this.viewer, new Cesium.Cartesian2(0,this.viewer.canvas.clientHeight));
 
-        this.topLeftMarker.update(topLeftCartesian);
-        this.topRightMarker.update(topRightCartesian);
-        this.bottomRightMarker.update(bottomRightCartesian);
-        this.bottomLeftMarker.update(bottomLeftCartesian);
+        topLeftCartesian && this.topLeftMarker.update(topLeftCartesian);
+        topRightCartesian && this.topRightMarker.update(topRightCartesian);
+        bottomRightCartesian && this.bottomRightMarker.update(bottomRightCartesian);
+        bottomLeftCartesian && this.bottomLeftMarker.update(bottomLeftCartesian);
 
-        const datum = {
-            target: targetCartesian,
-            camera: pursuitCartesian,
-            video: {
-                topLeft: topLeftCartesian,
-                topRight: topRightCartesian,
-                bottomRight: bottomRightCartesian,
-                bottomLeft: bottomLeftCartesian,
-            }
-        };
+        if (!this.recording) { return; }
 
-        const topLeftCartographic = toCartographic(topLeftCartesian);
-        const topRightCartographic = toCartographic(topRightCartesian);
-        const bottomRightCartographic = toCartographic(bottomRightCartesian);
-        const bottomLeftCartographic = toCartographic(bottomLeftCartesian);
+        const topLeftIntersection = topLeftCartesian ? 't' : 'f';
+        const topRightIntersection = topRightCartesian ? 't' : 'f';
+        const bottomRightIntersection = bottomRightCartesian ? 't' : 'f';
+        const bottomLeftIntersection = bottomLeftCartesian ? 't' : 'f';
+
+        const defaultCartographic = Cesium.Cartographic.fromDegrees(0, 0, 0);
+        const topLeftCartographic = topLeftCartesian ? toCartographic(topLeftCartesian) : defaultCartographic;
+        const topRightCartographic = topRightCartesian ? toCartographic(topRightCartesian) : defaultCartographic;
+        const bottomRightCartographic = bottomRightCartesian ? toCartographic(bottomRightCartesian) : defaultCartographic;
+        const bottomLeftCartographic = bottomLeftCartesian ? toCartographic(bottomLeftCartesian) : defaultCartographic;
 
         const elapsedMilliseconds = Date.now() - this.startMilliseconds;
 
         const line =
             `${elapsedMilliseconds},`+
-            `${topLeftCartographic.latitude},${topLeftCartographic.longitude},${topLeftCartographic.height},'t',`+
-            `${topRightCartographic.latitude},${topRightCartographic.longitude},${topRightCartographic.height},'t',`+
-            `${bottomRightCartographic.latitude},${bottomRightCartographic.longitude},${bottomRightCartographic.height},'t',`+
-            `${bottomLeftCartographic.latitude},${bottomLeftCartographic.longitude},${bottomLeftCartographic.height},'t',` +
+            `${topLeftCartographic.latitude},${topLeftCartographic.longitude},${topLeftCartographic.height},${topLeftIntersection},`+
+            `${topRightCartographic.latitude},${topRightCartographic.longitude},${topRightCartographic.height},${topRightIntersection},`+
+            `${bottomRightCartographic.latitude},${bottomRightCartographic.longitude},${bottomRightCartographic.height},${bottomRightIntersection},`+
+            `${bottomLeftCartographic.latitude},${bottomLeftCartographic.longitude},${bottomLeftCartographic.height},${bottomLeftIntersection},` +
             `${pursuitCartographic.latitude},${pursuitCartographic.longitude},${pursuitCartographic.height}`;
 
         this.recordedData.push(line);

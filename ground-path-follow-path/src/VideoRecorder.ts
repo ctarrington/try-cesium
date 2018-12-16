@@ -20,7 +20,7 @@ export class VideoRecorder {
     handleSourceOpen(event:Event) {
         console.log('MediaSource opened');
         this.sourceBuffer = this.mediaSource.addSourceBuffer('video/webm; codecs="vp8"');
-        console.log('Source buffer: ', this.sourceBuffer);
+        console.log('Source Open. buffer: ', this.sourceBuffer);
     }
 
     startRecording() {
@@ -33,6 +33,10 @@ export class VideoRecorder {
         const handleStop = (event:Event) => {
             console.log('Recorder stopped: ', event);
             new Blob(this.recordedBlobs, {type: 'video/webm'});
+        };
+
+        const handleError = (error : MediaRecorderErrorEvent) => {
+            console.log('Recorder error: ', error);
         };
 
         this.recording = true;
@@ -59,6 +63,7 @@ export class VideoRecorder {
         console.log('Created MediaRecorder', this.mediaRecorder, 'with options');
         this.mediaRecorder.onstop = handleStop;
         this.mediaRecorder.ondataavailable = handleDataAvailable;
+        this.mediaRecorder.onerror = handleError;
         this.mediaRecorder.start(100); // collect 100ms of data
         console.log('MediaRecorder started', this.mediaRecorder);
     }
