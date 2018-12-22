@@ -27,15 +27,18 @@ const {canvas, camera, scene} = viewer;
 
 //new Cesium.CesiumInspector('inspector', scene);
 
+const videoElement : HTMLVideoElement = document.getElementsByTagName('video')[0];
+
 const state = {
-    positionPlaybackPaused: false,
-    showPursuit: true,
+    positionPlaybackPaused: true,
+    videoPlaybackPaused: true,
+    showPursuit: false,
 };
 
 const buttonBar = new ButtonBar();
 buttonBar.addToggle<boolean>(
-    ['Pause Positions', 'Resume Positions'],
-    [false, true],
+    ['Play Position Data', 'Pause Position Data'],
+    [true, false],
     (value)=>{state.positionPlaybackPaused = value; }
     );
 
@@ -62,6 +65,20 @@ buttonBar.addToggle<boolean>(
             buttonBar.addButton('Download', ()=>{
                 pursuitCamera.download();
             })
+        }
+    }
+);
+
+buttonBar.addToggle<boolean>(
+    ['Play Video', 'Pause Video'],
+    [true, false],
+    (value)=> {
+        if (value) {
+            videoElement.pause();
+            state.videoPlaybackPaused = true;
+        } else {
+            videoElement.play();
+            state.videoPlaybackPaused = false;
         }
     }
 );
@@ -97,7 +114,6 @@ camera.flyTo({
 });
 
 const initialPursuitPosition = Cesium.Cartesian3.fromDegrees(-115.654969, 32.77377, 400.0);
-
 const pathPromise = generateCartographicGroundPath(terrainProvider, waypoints);
 
 Cesium.when(pathPromise, function(updatedCartographicPositions:Cesium.Cartographic[]) {
@@ -125,6 +141,23 @@ Cesium.when(pathPromise, function(updatedCartographicPositions:Cesium.Cartograph
   }, 1000/FPS);
 
 });
+
+const videoDrapedPolygon = new VideoDrapedPolygon(viewer, videoElement);
+const dataReader = new DataReader('./assets/recorderData.csv');
+const dataLoadedPromise = dataReader.load();
+
+Cesium.when(dataLoadedPromise, () => {
+    setInterval(()=> {
+        if (state.videoPlaybackPaused) {
+            return;
+        }
+
+        const elapsedMilliseconds = videoElement.currentTime;
+        const closestData = dataReader.findClosestData(elapsedMilliseconds);
+        videoDrapedPolygon.update(closestData);
+    }, 1000/FPS);
+});
+
 
 
 

@@ -14,3 +14,10 @@ div#button-bar {
     top: 10px;
     left: 10px;
 }
+
+video {
+    position: absolute;
+    bottom: 30px;
+    right: 20px;
+    width: 150px;
+}
