@@ -56,7 +56,6 @@ export class PursuitCamera {
 
         if (enabled) {
             this.camera.frustum = this.enabledFrustrum;
-            this.startMilliseconds = Date.now();
         }
 
         this.topLeftMarker = createMarker(viewer, Cesium.Color.RED);
@@ -137,6 +136,7 @@ export class PursuitCamera {
     startRecording() {
         this.videoRecorder.startRecording();
         this.recording = true;
+        this.startMilliseconds = Date.now();
     }
 
     stopRecording() {

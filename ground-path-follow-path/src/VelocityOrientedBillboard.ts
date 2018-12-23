@@ -12,7 +12,9 @@ export class VelocityOrientedBillboard {
 
     constructor(viewer:Cesium.Viewer,
                 url: string,
-                color: Cesium.Color = Cesium.Color.WHITE, width: number = 25, height = 25) {
+                color: Cesium.Color = Cesium.Color.WHITE,
+                width: number = 25,
+                height = 25) {
         this.position = defaultPosition;
         this.previousPosition = defaultPosition;
         this.rotation = 0;

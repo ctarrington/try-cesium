@@ -1,4 +1,4 @@
-import {raiseCartesian, subtractCartesians} from "./cesium-helpers";
+import {raiseCartesian, subtractCartesians, toCartesian} from "./cesium-helpers";
 
 const Cesium = require('cesium/Cesium');
 
@@ -7,10 +7,13 @@ require('./main.css');
 
 import {ModelEntity} from './ModelEntity';
 import {PursuitCamera} from './PursuitCamera';
+import {DataReader} from './DataReader';
+import {DataLocator} from './DataLocator';
 
 import {generateCartographicGroundPath} from './CartographicGroundPath';
 import {generateAirPursuitPath} from './AirPursuitPath';
 import {VelocityOrientedBillboard} from './VelocityOrientedBillboard';
+import {VideoDrapedPolygon} from './VideoDrapedPolygon';
 import {ButtonBar} from './ButtonBar';
 
 const terrainProvider = Cesium.createWorldTerrain();
@@ -101,7 +104,6 @@ const pursuitBillboard = new VelocityOrientedBillboard(
     'data:image/svg+xml,'+encodeURIComponent(svgArrowLiteral),
     Cesium.Color.BLACK);
 
-
 const waypoints = [
     {position:Cesium.Cartographic.fromDegrees(-115.654969, 32.773781), speed: 27},
     {position:Cesium.Cartographic.fromDegrees(-115.663605, 32.773777), speed: 27},
@@ -143,17 +145,21 @@ Cesium.when(pathPromise, function(updatedCartographicPositions:Cesium.Cartograph
 });
 
 const videoDrapedPolygon = new VideoDrapedPolygon(viewer, videoElement);
-const dataReader = new DataReader('./assets/recorderData.csv');
+const dataReader = new DataReader('assets/recordedData.csv');
 const dataLoadedPromise = dataReader.load();
 
-Cesium.when(dataLoadedPromise, () => {
+Cesium.when(dataLoadedPromise, (rows:any[]) => {
+    const dataLocator = new DataLocator(rows, 'elapsedMilliseconds');
+
     setInterval(()=> {
         if (state.videoPlaybackPaused) {
             return;
         }
 
-        const elapsedMilliseconds = videoElement.currentTime;
-        const closestData = dataReader.findClosestData(elapsedMilliseconds);
+        // TODO make new csv and get rid of 6800 offset
+        const elapsedMilliseconds = videoElement.currentTime * 1000 + 6800;
+        const closestData = dataLocator.findClosestData(elapsedMilliseconds);
+        console.log('elapsedMilliseconds', elapsedMilliseconds, closestData);
         videoDrapedPolygon.update(closestData);
     }, 1000/FPS);
 });
