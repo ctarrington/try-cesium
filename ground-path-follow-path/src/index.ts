@@ -10,7 +10,7 @@ import {PursuitCamera} from './PursuitCamera';
 import {DataReader} from './DataReader';
 import {DataLocator} from './DataLocator';
 
-import {generateCartographicGroundPath} from './CartographicGroundPath';
+import {generateCartographicGroundPath, WayPoint} from './CartographicGroundPath';
 import {generateAirPursuitPath} from './AirPursuitPath';
 import {VelocityOrientedBillboard} from './VelocityOrientedBillboard';
 import {VideoDrapedPolygon} from './VideoDrapedPolygon';
@@ -104,23 +104,24 @@ const pursuitBillboard = new VelocityOrientedBillboard(
     'data:image/svg+xml,'+encodeURIComponent(svgArrowLiteral),
     Cesium.Color.BLACK);
 
-const waypoints = [
-    {position:Cesium.Cartographic.fromDegrees(-115.654969, 32.773781), speed: 27},
-    {position:Cesium.Cartographic.fromDegrees(-115.663605, 32.773777), speed: 27},
-    {position:Cesium.Cartographic.fromDegrees(-115.663647, 32.782038), speed: 27},
-    {position:Cesium.Cartographic.fromDegrees(-115.680752, 32.782039), speed: 27},
+const waypoints : WayPoint[] = [
+    {position:Cesium.Cartographic.fromDegrees(-115.654969, 32.773781)},
+    {position:Cesium.Cartographic.fromDegrees(-115.655162, 32.781906)},
+    {position:Cesium.Cartographic.fromDegrees(-115.663648, 32.781964)},
+    {position:Cesium.Cartographic.fromDegrees(-115.663646, 32.784464)},
+    {position:Cesium.Cartographic.fromDegrees(-115.6730646, 32.785064)},
 ];
 
 camera.flyTo({
-    destination : Cesium.Cartesian3.fromDegrees(-115.654969, 32.773781, 1200.0)
+    destination : Cesium.Cartesian3.fromDegrees(-115.654969, 32.773781, 900.0)
 });
 
-const initialPursuitPosition = Cesium.Cartesian3.fromDegrees(-115.654969, 32.77377, 400.0);
+const initialPursuitPosition = Cesium.Cartesian3.fromDegrees(-115.654960, 32.77377, 400.0);
 const pathPromise = generateCartographicGroundPath(terrainProvider, waypoints);
 
 Cesium.when(pathPromise, function(updatedCartographicPositions:Cesium.Cartographic[]) {
 
-  const pursuitCartesianPositions = generateAirPursuitPath(updatedCartographicPositions, initialPursuitPosition, 40, 200,300);
+  const pursuitCartesianPositions = generateAirPursuitPath(updatedCartographicPositions, initialPursuitPosition, 75, 200,300);
 
   let pctr = 0;
   setInterval(()=> {
@@ -157,7 +158,7 @@ Cesium.when(dataLoadedPromise, (rows:any[]) => {
         }
 
         // TODO make new csv and get rid of 6800 offset
-        const elapsedMilliseconds = videoElement.currentTime * 1000 + 6800;
+        const elapsedMilliseconds = videoElement.currentTime * 1000;
         const closestData = dataLocator.findClosestData(elapsedMilliseconds);
         console.log('elapsedMilliseconds', elapsedMilliseconds, closestData);
         videoDrapedPolygon.update(closestData);

@@ -11,8 +11,8 @@ npm start
 * record camera position, frustrum corners X
 * record video  X
 * start and stop buttons for video and capturing camera meta data  X
-* video playback
-* video playback as draped polygon
+* video playback  X
+* video playback as draped polygon   *O*
 * camera that follows draped video polygon so it stays centered
 * follow draped polygon so it stays oriented even with camera roll
 

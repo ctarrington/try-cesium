@@ -6,7 +6,8 @@ const Cesium = require('cesium/Cesium');
 export class VideoDrapedPolygon {
     cornerCartesiansArray: Cesium.Cartesian3[];
     stRotation: number;
-    marker: CylinderEntity;
+    topLeftMarker: CylinderEntity;
+    topRightMarker: CylinderEntity;
 
 
     constructor(viewer:Cesium.Viewer, videoElement : HTMLVideoElement) {
@@ -18,27 +19,17 @@ export class VideoDrapedPolygon {
             122, 44.999999, 0
         ]);
 
-        this.calculateHierarchy = this.calculateHierarchy.bind(this);
-        this.calculateStRotation = this.calculateStRotation.bind(this);
-
         const polygon = viewer.entities.add({
             name : 'Video Polygon',
             polygon : {
-                hierarchy : new Cesium.CallbackProperty(this.calculateHierarchy, false),
+                hierarchy : new Cesium.CallbackProperty(()=>{return {positions: this.cornerCartesiansArray};}, false),
                 material: videoElement,
-                stRotation: new Cesium.CallbackProperty(this.calculateStRotation, false),
+                stRotation: new Cesium.CallbackProperty(()=> this.stRotation, false),
             }
         });
 
-        this.marker = new CylinderEntity(viewer, 10, Cesium.Color.RED, 20, 0);
-    }
-
-    calculateHierarchy() {
-        return {positions: this.cornerCartesiansArray};
-    }
-
-    calculateStRotation() {
-        return this.stRotation;
+        this.topLeftMarker = new CylinderEntity(viewer, 10, Cesium.Color.RED, 20, 0);
+        this.topRightMarker = new CylinderEntity(viewer, 10, Cesium.Color.GREEN, 20, 0);
     }
 
     update(closestData: any) {
@@ -49,6 +40,13 @@ export class VideoDrapedPolygon {
             toCartesian(closestData.bottomLeft),
         ];
         
-        this.marker.update(toCartesian(closestData.topLeft));
+        this.topLeftMarker.update(toCartesian(closestData.topLeft));
+        this.topRightMarker.update(toCartesian(closestData.topRight));
+
+        const deltaY = closestData.topLeft.latitude - closestData.bottomLeft.latitude;
+        const deltaX = closestData.topLeft.longitude - closestData.bottomLeft.longitude;
+
+        const sideAngle = -Math.atan2(deltaY, deltaX);
+        this.stRotation = sideAngle + Math.PI/2;
     }
 }

@@ -47,4 +47,6 @@ const terrainCartesianFromScreen = (viewer: Cesium.Viewer, screen: Cesium.Cartes
     return viewer.scene.globe.pick(ray, viewer.scene);
 }
 
-export {addCartesians, cross, multiplyByScalar, normalize, raiseCartesian, raiseCartographic, subtractCartesians, subtractCartographics, terrainCartesianFromScreen, toCartesian, toCartographic};
+const toDegrees = Cesium.Math.toDegrees;
+
+export {addCartesians, cross, multiplyByScalar, normalize, raiseCartesian, raiseCartographic, subtractCartesians, subtractCartographics, terrainCartesianFromScreen, toCartesian, toCartographic, toDegrees};

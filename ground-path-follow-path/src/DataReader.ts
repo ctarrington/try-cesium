@@ -43,11 +43,11 @@ export class DataReader {
                 bottomLeftLat, bottomLeftLon, bottomLeftHeight,
                 cameraLat, cameraLon, cameraHeight] = values;
 
-            const topLeft = Cesium.Cartographic.fromRadians(topLeftLon, topLeftLat, topLeftHeight);
-            const topRight = Cesium.Cartographic.fromRadians(topRightLon, topRightLat, topRightHeight);
-            const bottomRight = Cesium.Cartographic.fromRadians(bottomRightLon, bottomRightLat, bottomRightHeight);
-            const bottomLeft = Cesium.Cartographic.fromRadians(bottomLeftLon, bottomLeftLat, bottomLeftHeight);
-            const camera = Cesium.Cartographic.fromRadians(cameraLon, cameraLat, cameraHeight);
+            const topLeft = Cesium.Cartographic.fromDegrees(topLeftLon, topLeftLat, topLeftHeight);
+            const topRight = Cesium.Cartographic.fromDegrees(topRightLon, topRightLat, topRightHeight);
+            const bottomRight = Cesium.Cartographic.fromDegrees(bottomRightLon, bottomRightLat, bottomRightHeight);
+            const bottomLeft = Cesium.Cartographic.fromDegrees(bottomLeftLon, bottomLeftLat, bottomLeftHeight);
+            const camera = Cesium.Cartographic.fromDegrees(cameraLon, cameraLat, cameraHeight);
 
             return {elapsedMilliseconds, topLeft, topRight, bottomRight, bottomLeft, camera};
         });

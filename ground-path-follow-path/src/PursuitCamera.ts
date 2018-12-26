@@ -10,7 +10,8 @@ import {
     subtractCartographics,
     terrainCartesianFromScreen,
     toCartesian,
-    toCartographic
+    toCartographic,
+    toDegrees
 } from './cesium-helpers';
 import {calculateBearing} from './calculations';
 import {DataRecorder} from './DataRecorder';
@@ -124,11 +125,11 @@ export class PursuitCamera {
 
         const line =
             `${elapsedMilliseconds},`+
-            `${topLeftCartographic.latitude},${topLeftCartographic.longitude},${topLeftCartographic.height},${topLeftIntersection},`+
-            `${topRightCartographic.latitude},${topRightCartographic.longitude},${topRightCartographic.height},${topRightIntersection},`+
-            `${bottomRightCartographic.latitude},${bottomRightCartographic.longitude},${bottomRightCartographic.height},${bottomRightIntersection},`+
-            `${bottomLeftCartographic.latitude},${bottomLeftCartographic.longitude},${bottomLeftCartographic.height},${bottomLeftIntersection},` +
-            `${pursuitCartographic.latitude},${pursuitCartographic.longitude},${pursuitCartographic.height}`;
+            `${toDegrees(topLeftCartographic.latitude)},    ${toDegrees(topLeftCartographic.longitude)},${topLeftCartographic.height},${topLeftIntersection},`+
+            `${toDegrees(topRightCartographic.latitude)},   ${toDegrees(topRightCartographic.longitude)},${topRightCartographic.height},${topRightIntersection},`+
+            `${toDegrees(bottomRightCartographic.latitude)},${toDegrees(bottomRightCartographic.longitude)},${bottomRightCartographic.height},${bottomRightIntersection},`+
+            `${toDegrees(bottomLeftCartographic.latitude)}, ${toDegrees(bottomLeftCartographic.longitude)},${bottomLeftCartographic.height},${bottomLeftIntersection},` +
+            `${toDegrees(pursuitCartographic.latitude)},    ${toDegrees(pursuitCartographic.longitude)},${pursuitCartographic.height}`;
 
         this.recordedData.push(line);
     }

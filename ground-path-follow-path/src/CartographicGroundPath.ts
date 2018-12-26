@@ -4,11 +4,10 @@ type PathProvider = (terrainProvider : Cesium.TerrainProvider, waypoints:WayPoin
 
 type WayPoint = {
   position: Cesium.Cartographic,
-  speed: number,
 };
 
 const generateCartographicGroundPath : PathProvider = (terrainProvider : Cesium.TerrainProvider, waypoints:WayPoint[]) => {
-  const step = 0.00000005;
+  const step = 0.0000005;
 
   const positions : Cesium.Cartographic[] = [];
   for (let wctr=0;wctr < waypoints.length-1; wctr++) {
@@ -19,9 +18,10 @@ const generateCartographicGroundPath : PathProvider = (terrainProvider : Cesium.
     const deltaLat = secondCartographic.latitude - firstCartographic.latitude;
 
 
-    const numSteps = Math.max(deltaLon/step, deltaLat/step);
+    const numSteps = Math.max(Math.abs(deltaLon/step), Math.abs(deltaLat/step));
     const lonStep = deltaLon / numSteps;
     const latStep = deltaLat / numSteps;
+    console.log('numSteps, lonStep, latStep', numSteps, lonStep, latStep);
 
     let lon = firstCartographic.longitude;
     let lat = firstCartographic.latitude;
