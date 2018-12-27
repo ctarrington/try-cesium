@@ -19,14 +19,15 @@ export class VideoDrapedPolygon {
             122, 44.999999, 0
         ]);
 
-        const polygon = viewer.entities.add({
+        const polygon = viewer.entities.add(new Cesium.Entity({
             name : 'Video Polygon',
-            polygon : {
+            polygon : new Cesium.PolygonGraphics({
                 hierarchy : new Cesium.CallbackProperty(()=>{return {positions: this.cornerCartesiansArray};}, false),
-                material: videoElement,
+                material : videoElement,
                 stRotation: new Cesium.CallbackProperty(()=> this.stRotation, false),
-            }
-        });
+            }),
+        })
+        );
 
         this.topLeftMarker = new CylinderEntity(viewer, 10, Cesium.Color.RED, 20, 0);
         this.topRightMarker = new CylinderEntity(viewer, 10, Cesium.Color.GREEN, 20, 0);
