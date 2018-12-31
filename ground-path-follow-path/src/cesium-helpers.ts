@@ -1,3 +1,5 @@
+import {Cartesian3} from "cesium";
+
 const Cesium = require('cesium/Cesium');
 
 const toCartographic = (cartesian:Cesium.Cartesian3) : Cesium.Cartographic => {
@@ -58,6 +60,10 @@ const combine = (first: Cesium.Cartesian3, second: Cesium.Cartesian3, alpha:numb
 
 const cartesianMidpoint = (first: Cesium.Cartesian3, second: Cesium.Cartesian3) => {
     return combine(first, second, 0.5);
-}
+};
 
-export {addCartesians, cartesianMidpoint, combine, cross, multiplyByScalar, normalize, raiseCartesian, raiseCartographic, subtractCartesians, subtractCartographics, terrainCartesianFromScreen, toCartesian, toCartographic, toDegrees};
+const clamp = (min:number, max:number, value:number) => {
+    return Math.min(Math.max(min, value), max);
+};
+
+export {addCartesians, cartesianMidpoint, clamp, combine, cross, multiplyByScalar, normalize, raiseCartesian, raiseCartographic, subtractCartesians, subtractCartographics, terrainCartesianFromScreen, toCartesian, toCartographic, toDegrees};

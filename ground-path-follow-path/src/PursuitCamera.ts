@@ -4,6 +4,7 @@ import {VideoRecorder} from './VideoRecorder';
 const Cesium = require('cesium/Cesium');
 
 import {
+    clamp,
     raiseCartesian,
     raiseCartographic,
     subtractCartesians,
@@ -28,7 +29,7 @@ export class PursuitCamera {
     camera: Cesium.Camera;
     videoRecorder: VideoRecorder;
     recording: boolean;
-    recordedData:any;
+    recordedData:string[];
     enabled: boolean;
     disabledFrustrum: Cesium.PerspectiveFrustum;
     enabledFrustrum: Cesium.PerspectiveFrustum;
@@ -37,6 +38,8 @@ export class PursuitCamera {
     bottomRightMarker: CylinderEntity;
     bottomLeftMarker: CylinderEntity;
     startMilliseconds: number;
+    deltaRoll: number;
+    roll:number;
 
     constructor(viewer: Cesium.Viewer, enabled:boolean = false) {
         this.viewer = viewer;
@@ -45,6 +48,8 @@ export class PursuitCamera {
         this.videoRecorder = new VideoRecorder(viewer.canvas);
         this.recording = false;
         this.recordedData = [];
+        this.deltaRoll = 0;
+        this.roll = 0;
 
         const aspectRatio = viewer.canvas.clientWidth / viewer.canvas.clientHeight;
 
@@ -92,12 +97,23 @@ export class PursuitCamera {
         const bearing = calculateBearing(pursuitCartographic, targetCartographic);
         const pitch = Cesium.Cartesian3.angleBetween(fromPursuitToTarget, fromPursuitToRaisedTarget);
 
+        const epsilon = Math.PI/200;
+        const chance = Math.random();
+        if (chance < 0.1 || this.deltaRoll > 3*epsilon) {
+            this.deltaRoll -= epsilon;
+        } else if (chance > 0.9 || this.deltaRoll < -3*epsilon) {
+            this.deltaRoll += epsilon;
+        }
+
+        this.roll += this.deltaRoll;
+        this.roll = clamp(-Math.PI/4, Math.PI/4, this.roll);
+
         this.camera.setView({
             destination : pursuitCartesian,
             orientation: {
                 heading : bearing,
                 pitch : -pitch,
-                roll : 0.0,
+                roll: this.roll,
             }
         });
 
