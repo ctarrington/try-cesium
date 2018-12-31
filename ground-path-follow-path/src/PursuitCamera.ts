@@ -20,6 +20,9 @@ const createMarker = (viewer: Cesium.Viewer, color:Cesium.Color) => {
     return new CylinderEntity(viewer, 10, color, 4, 0);
 };
 
+const ENABLED_FOV = Math.PI/20;
+const DISABLED_FOV = Math.PI/4;
+
 export class PursuitCamera {
     viewer: Cesium.Viewer;
     camera: Cesium.Camera;
@@ -46,12 +49,12 @@ export class PursuitCamera {
         const aspectRatio = viewer.canvas.clientWidth / viewer.canvas.clientHeight;
 
         this.disabledFrustrum = new Cesium.PerspectiveFrustum({
-            fov: Math.PI/4,
+            fov: DISABLED_FOV,
             aspectRatio,
         });
 
         this.enabledFrustrum = new Cesium.PerspectiveFrustum({
-            fov: Math.PI/20,
+            fov: ENABLED_FOV,
             aspectRatio,
         });
 

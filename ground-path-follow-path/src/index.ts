@@ -14,6 +14,7 @@ import {generateCartographicGroundPath, WayPoint} from './CartographicGroundPath
 import {generateAirPursuitPath} from './AirPursuitPath';
 import {VelocityOrientedBillboard} from './VelocityOrientedBillboard';
 import {VideoDrapedPolygon} from './VideoDrapedPolygon';
+import {VideoFollowCamera} from './VideoFollowCamera';
 import {ButtonBar} from './ButtonBar';
 
 const terrainProvider = Cesium.createWorldTerrain();
@@ -22,6 +23,7 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
 });
 
 const pursuitCamera = new PursuitCamera(viewer);
+const videoFollowCamera = new VideoFollowCamera(viewer);
 
 
 const FPS = 30;
@@ -50,6 +52,7 @@ buttonBar.addToggle<boolean>(
     [false, true],
     (value)=> {
         if (value) {
+            videoFollowCamera.disable();
             pursuitCamera.enable();
         } else {
             pursuitCamera.disable();
@@ -82,6 +85,19 @@ buttonBar.addToggle<boolean>(
         } else {
             videoElement.play();
             state.videoPlaybackPaused = false;
+        }
+    }
+);
+
+buttonBar.addToggle<boolean>(
+    ['Follow Video', 'Overhead'],
+    [false, true],
+    (value)=> {
+        if (value) {
+            pursuitCamera.disable();
+            videoFollowCamera.enable();
+        } else {
+            videoFollowCamera.disable();
         }
     }
 );
@@ -160,8 +176,8 @@ Cesium.when(dataLoadedPromise, (rows:any[]) => {
         // TODO make new csv and get rid of 6800 offset
         const elapsedMilliseconds = videoElement.currentTime * 1000;
         const closestData = dataLocator.findClosestData(elapsedMilliseconds);
-        console.log('elapsedMilliseconds', elapsedMilliseconds, closestData);
         videoDrapedPolygon.update(closestData);
+        videoFollowCamera.update(closestData);
     }, 1000/FPS);
 });
 

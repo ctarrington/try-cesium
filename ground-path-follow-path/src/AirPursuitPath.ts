@@ -1,5 +1,6 @@
 import {
     addCartesians,
+    combine,
     cross,
     multiplyByScalar,
     normalize,
@@ -13,13 +14,6 @@ const Cesium = require('cesium/Cesium');
 type PathProvider = (positions:Cesium.Cartographic[], initialPursuitPosition: Cesium.Cartesian3, speedInMetersPerSecond: number, goalDistance: number, height : number) => Cesium.Cartesian3[];
 
 const TIME_PER_TICK = 1/33;
-
-function combine(first: Cesium.Cartesian3, second: Cesium.Cartesian3, alpha:number) {
-    const firstScaled = multiplyByScalar(first, alpha);
-    const secondScaled = multiplyByScalar(second, 1-alpha);
-
-    return addCartesians(firstScaled, secondScaled);
-}
 
 const generateAirPursuitPath : PathProvider = (targetPositions, initialPursuitPosition, speedInMetersPerSecond, goalDistance, height) => {
     const positions = [];

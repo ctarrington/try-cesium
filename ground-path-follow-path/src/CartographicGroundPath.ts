@@ -21,7 +21,7 @@ const generateCartographicGroundPath : PathProvider = (terrainProvider : Cesium.
     const numSteps = Math.max(Math.abs(deltaLon/step), Math.abs(deltaLat/step));
     const lonStep = deltaLon / numSteps;
     const latStep = deltaLat / numSteps;
-    console.log('numSteps, lonStep, latStep', numSteps, lonStep, latStep);
+    // console.log('numSteps, lonStep, latStep', numSteps, lonStep, latStep);
 
     let lon = firstCartographic.longitude;
     let lat = firstCartographic.latitude;

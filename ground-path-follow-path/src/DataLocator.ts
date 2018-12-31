@@ -1,5 +1,7 @@
 
 // TODO type it
+import {VideoData} from './VideoData';
+
 export class DataLocator {
     key: string;
     rows:any[];
@@ -23,7 +25,7 @@ export class DataLocator {
         }
     }
 
-    findClosestData(desiredValue: number) : any {
+    findClosestData(desiredValue: number) : VideoData {
         if (desiredValue <= this.rows[0][this.key]) {
             return this.rows[0];
         }

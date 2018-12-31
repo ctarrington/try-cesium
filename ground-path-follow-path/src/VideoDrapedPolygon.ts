@@ -1,10 +1,11 @@
 import {toCartesian} from './cesium-helpers';
 import {CylinderEntity} from './CylinderEntity';
+import {VideoData} from './VideoData';
 
 const Cesium = require('cesium/Cesium');
 
 export class VideoDrapedPolygon {
-    cornerCartesiansArray: Cesium.Cartesian3[];
+    cornerCartesians: Cesium.Cartesian3[];
     stRotation: number;
     topLeftMarker: CylinderEntity;
     topRightMarker: CylinderEntity;
@@ -12,7 +13,7 @@ export class VideoDrapedPolygon {
 
     constructor(viewer:Cesium.Viewer, videoElement : HTMLVideoElement) {
         this.stRotation = 0;
-        this.cornerCartesiansArray = Cesium.Cartesian3.fromDegreesArrayHeights([
+        this.cornerCartesians = Cesium.Cartesian3.fromDegreesArrayHeights([
             122, 45, 0,
             122.00001, 45, 0,
             122.00001, 44.99999, 0,
@@ -22,7 +23,7 @@ export class VideoDrapedPolygon {
         const polygon = viewer.entities.add(new Cesium.Entity({
             name : 'Video Polygon',
             polygon : new Cesium.PolygonGraphics({
-                hierarchy : new Cesium.CallbackProperty(()=>{return {positions: this.cornerCartesiansArray};}, false),
+                hierarchy : new Cesium.CallbackProperty(()=>{return {positions: this.cornerCartesians};}, false),
                 material : videoElement,
                 stRotation: new Cesium.CallbackProperty(()=> this.stRotation, false),
             }),
@@ -33,19 +34,19 @@ export class VideoDrapedPolygon {
         this.topRightMarker = new CylinderEntity(viewer, 10, Cesium.Color.GREEN, 20, 0);
     }
 
-    update(closestData: any) {
-        this.cornerCartesiansArray = [
-            toCartesian(closestData.topLeft),
-            toCartesian(closestData.topRight),
-            toCartesian(closestData.bottomRight),
-            toCartesian(closestData.bottomLeft),
+    update(videoData: VideoData) {
+        this.cornerCartesians = [
+            toCartesian(videoData.topLeft),
+            toCartesian(videoData.topRight),
+            toCartesian(videoData.bottomRight),
+            toCartesian(videoData.bottomLeft),
         ];
         
-        this.topLeftMarker.update(toCartesian(closestData.topLeft));
-        this.topRightMarker.update(toCartesian(closestData.topRight));
+        this.topLeftMarker.update(toCartesian(videoData.topLeft));
+        this.topRightMarker.update(toCartesian(videoData.topRight));
 
-        const deltaY = closestData.topLeft.latitude - closestData.bottomLeft.latitude;
-        const deltaX = closestData.topLeft.longitude - closestData.bottomLeft.longitude;
+        const deltaY = videoData.topLeft.latitude - videoData.bottomLeft.latitude;
+        const deltaX = videoData.topLeft.longitude - videoData.bottomLeft.longitude;
 
         const sideAngle = -Math.atan2(deltaY, deltaX);
         this.stRotation = sideAngle + Math.PI/2;

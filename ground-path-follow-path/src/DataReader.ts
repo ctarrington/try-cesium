@@ -1,4 +1,9 @@
+import {toCartesian} from "./cesium-helpers";
+
 const Cesium = require('cesium/Cesium');
+
+import {VideoData} from './VideoData';
+
 
 export class DataReader {
     loadedPromise: Promise<any[]>;
@@ -24,7 +29,7 @@ export class DataReader {
         });
     }
 
-    private parseData(raw:string): any[] {
+    private parseData(raw:string): VideoData[] {
         const rows = raw.split(/[\r\n]+/);
 
         const parsed = rows.map(row => {
@@ -49,7 +54,16 @@ export class DataReader {
             const bottomLeft = Cesium.Cartographic.fromDegrees(bottomLeftLon, bottomLeftLat, bottomLeftHeight);
             const camera = Cesium.Cartographic.fromDegrees(cameraLon, cameraLat, cameraHeight);
 
-            return {elapsedMilliseconds, topLeft, topRight, bottomRight, bottomLeft, camera};
+            const cornerCartesians = [
+                toCartesian(topLeft),
+                toCartesian(topRight),
+                toCartesian(bottomRight),
+                toCartesian(bottomLeft),
+            ];
+
+            const cameraCartesian = toCartesian(camera);
+
+            return {elapsedMilliseconds, topLeft, topRight, bottomRight, bottomLeft, camera, cornerCartesians, cameraCartesian};
         });
 
         return parsed;

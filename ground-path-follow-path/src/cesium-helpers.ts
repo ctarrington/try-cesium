@@ -49,4 +49,15 @@ const terrainCartesianFromScreen = (viewer: Cesium.Viewer, screen: Cesium.Cartes
 
 const toDegrees = Cesium.Math.toDegrees;
 
-export {addCartesians, cross, multiplyByScalar, normalize, raiseCartesian, raiseCartographic, subtractCartesians, subtractCartographics, terrainCartesianFromScreen, toCartesian, toCartographic, toDegrees};
+const combine = (first: Cesium.Cartesian3, second: Cesium.Cartesian3, alpha:number) => {
+    const firstScaled = multiplyByScalar(first, alpha);
+    const secondScaled = multiplyByScalar(second, 1-alpha);
+
+    return addCartesians(firstScaled, secondScaled);
+};
+
+const cartesianMidpoint = (first: Cesium.Cartesian3, second: Cesium.Cartesian3) => {
+    return combine(first, second, 0.5);
+}
+
+export {addCartesians, cartesianMidpoint, combine, cross, multiplyByScalar, normalize, raiseCartesian, raiseCartographic, subtractCartesians, subtractCartographics, terrainCartesianFromScreen, toCartesian, toCartographic, toDegrees};
