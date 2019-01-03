@@ -1,10 +1,11 @@
-import {raiseCartesian, subtractCartesians, toCartesian} from "./cesium-helpers";
+import {raiseCartesian, raiseCartographic, subtractCartesians, toCartesian} from "./cesium-helpers";
 
 const Cesium = require('cesium/Cesium');
 
 require('cesium/Widgets/widgets.css');
 require('./main.css');
 
+import {getToken} from './DoNotCheckin';
 import {ModelEntity} from './ModelEntity';
 import {PursuitCamera} from './PursuitCamera';
 import {DataReader} from './DataReader';
@@ -16,6 +17,8 @@ import {VelocityOrientedBillboard} from './VelocityOrientedBillboard';
 import {VideoDrapedPolygon} from './VideoDrapedPolygon';
 import {VideoFollowCamera} from './VideoFollowCamera';
 import {ButtonBar} from './ButtonBar';
+
+Cesium.Ion.defaultAccessToken = getToken();
 
 const terrainProvider = Cesium.createWorldTerrain();
 const viewer = new Cesium.Viewer('cesiumContainer', {
@@ -128,8 +131,9 @@ const waypoints : WayPoint[] = [
     {position:Cesium.Cartographic.fromDegrees(-115.6730646, 32.785064)},
 ];
 
+const initialCameraCartographic = raiseCartographic(waypoints[0].position, waypoints[0].position.height+900);
 camera.flyTo({
-    destination : Cesium.Cartesian3.fromDegrees(-115.654969, 32.773781, 900.0)
+    destination : toCartesian(initialCameraCartographic),
 });
 
 const initialPursuitPosition = Cesium.Cartesian3.fromDegrees(-115.654960, 32.77377, 400.0);
