@@ -18,6 +18,14 @@ import {VideoDrapedPolygon} from './VideoDrapedPolygon';
 import {VideoFollowCamera} from './VideoFollowCamera';
 import {ButtonBar} from './ButtonBar';
 
+const socket = new WebSocket('ws://localhost:8015');
+socket.binaryType = 'arraybuffer';
+
+// Connection opened
+socket.addEventListener('open', function (event) {
+  console.log('Opened connection to web socket server');
+});
+
 Cesium.Ion.defaultAccessToken = getToken();
 
 const terrainProvider = Cesium.createWorldTerrain();
@@ -33,14 +41,35 @@ const FPS = 30;
 
 const {canvas, camera, scene} = viewer;
 
+// Listen for messages and render image on PIP canvas
+const pipCanvasElement: HTMLCanvasElement = document.getElementById('pip-canvas');
+const pipDrawingContext = pipCanvasElement.getContext('2d');
+
+const drawImageOnPIP = (msg: MessageEvent) => {
+  console.log('Drawing image from message');
+  console.log('msg.data:', msg.data);
+
+  const image = document.createElement('img');
+
+  image.onload = () => {
+    pipCanvasElement.width = image.width;
+    pipCanvasElement.height = image.height;
+    pipDrawingContext.drawImage(image, 0, 0);
+  };
+
+  image.src = 'data:image/jpeg;base64,'+ Buffer.from(msg.data).toString('base64');
+};
+
+socket.addEventListener('message',  drawImageOnPIP);
+
 //new Cesium.CesiumInspector('inspector', scene);
 
 const videoElement : HTMLVideoElement = document.getElementsByTagName('video')[0];
 
 const state = {
-    positionPlaybackPaused: true,
-    videoPlaybackPaused: true,
-    showPursuit: false,
+  positionPlaybackPaused: true,
+  videoPlaybackPaused: true,
+  showPursuit: false,
 };
 
 const buttonBar = new ButtonBar();
@@ -184,7 +213,6 @@ Cesium.when(dataLoadedPromise, (rows:any[]) => {
         videoFollowCamera.update(closestData);
     }, 1000/FPS);
 });
-
 
 
 

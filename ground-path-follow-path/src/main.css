@@ -21,3 +21,17 @@ video {
     right: 20px;
     width: 150px;
 }
+
+canvas#pip-canvas {
+    position: absolute;
+    bottom: 30px;
+    left: 20px;
+}
+
+img#pip-image {
+    position: absolute;
+    top: 30px;
+    left: -200000px;
+    width: 150px;
+    height: 150px;
+}
