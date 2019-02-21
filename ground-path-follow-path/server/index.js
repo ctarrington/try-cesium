@@ -6,33 +6,37 @@ const express = require('express');
 const app = express();
 const server = http.Server(app);
 
-const wss = new WebSocket.Server({
-  server,
-});
+const mjpegServer = require('mjpeg-server');
 
-const broadcast = (data) => {
-  console.log('broadcasting');
-  wss.clients.forEach(function each(client) {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(data);
+http.createServer(function(req, res) {
+  console.log("Got request");
+
+  const mjpegReqHandler = mjpegServer.createReqHandler(req, res);
+
+  let ctr = 0;
+  const max = 4;
+  let direction = 1;
+
+  function updateJPG() {
+    fs.readFile(__dirname + '/theimage'+ ctr + '.jpeg', sendJPGData);
+    ctr = ctr + direction;
+    if (ctr < 0) {
+      direction = 1;
+      ctr = 0;
     }
-  });
-}
 
-wss.on('connection', (socket) => {
-  console.log('Connection added');
+    if (ctr > max) {
+      direction = -1;
+      ctr = max;
+    }
 
-  const filename = 'theimage.jpg';
-  fs.readFile(filename, function (err, data) {
-    if (err) throw err;
+  }
 
-    console.log('got data from '+filename);
-    setInterval(() => {
-      broadcast(data);
-    }, 1000/33);
-  });
-});
+  const sendJPGData = (err, data) => {
+    console.log(`sendJPGData err: ${err}`);
+    mjpegReqHandler.write(data);
+  };
 
-server.listen(8015, () => {
-  console.log('listening on 8015');
-});
+  const timer = setInterval(updateJPG, 50);
+
+}).listen(8081);

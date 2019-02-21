@@ -45,22 +45,27 @@ const {canvas, camera, scene} = viewer;
 const pipCanvasElement: HTMLCanvasElement = document.getElementById('pip-canvas');
 const pipDrawingContext = pipCanvasElement.getContext('2d');
 
-const drawImageOnPIP = (msg: MessageEvent) => {
-  console.log('Drawing image from message');
-  console.log('msg.data:', msg.data);
+let fps = 0;
+const period = 5;
 
-  const image = document.createElement('img');
-
-  image.onload = () => {
-    pipCanvasElement.width = image.width;
-    pipCanvasElement.height = image.height;
-    pipDrawingContext.drawImage(image, 0, 0);
-  };
-
-  image.src = 'data:image/jpeg;base64,'+ Buffer.from(msg.data).toString('base64');
+const drawImageOnPIP = () => {
+  pipCanvasElement.width = image.width;
+  pipCanvasElement.height = image.height;
+  pipDrawingContext.drawImage(image, 0, 0);
+  fps++;
 };
 
-socket.addEventListener('message',  drawImageOnPIP);
+const image = document.createElement('img');
+image.onload = () => {
+  setInterval(drawImageOnPIP, 1000/30);
+};
+
+image.src = 'http://localhost:8081';
+
+setInterval(() => {
+  console.log(`fps: ${fps/period}`);
+  fps = 0;
+}, period * 1000);
 
 //new Cesium.CesiumInspector('inspector', scene);
 
