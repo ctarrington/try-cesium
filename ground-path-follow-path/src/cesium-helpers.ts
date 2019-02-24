@@ -1,5 +1,3 @@
-import {Cartesian3} from "cesium";
-
 const Cesium = require('cesium/Cesium');
 
 const toCartographic = (cartesian:Cesium.Cartesian3) : Cesium.Cartographic => {

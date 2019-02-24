@@ -23,7 +23,7 @@ socket.binaryType = 'arraybuffer';
 
 // Connection opened
 socket.addEventListener('open', function (event) {
-  console.log('Opened connection to web socket server');
+    console.log('Opened connection to web socket server');
 });
 
 Cesium.Ion.defaultAccessToken = getToken();
@@ -45,36 +45,40 @@ const {canvas, camera, scene} = viewer;
 const pipCanvasElement: HTMLCanvasElement = document.getElementById('pip-canvas');
 const pipDrawingContext = pipCanvasElement.getContext('2d');
 
+let startTime = new Date().getTime();
 let fps = 0;
-const period = 5;
+const drawImageOnPIP = (msg: MessageEvent) => {
+    // console.log('Drawing image from message');
+    // console.log('msg.data:', msg.data);
 
-const drawImageOnPIP = () => {
-  pipCanvasElement.width = image.width;
-  pipCanvasElement.height = image.height;
-  pipDrawingContext.drawImage(image, 0, 0);
-  fps++;
+    const image = document.createElement('img');
+
+    image.onload = () => {
+        pipCanvasElement.width = image.width;
+        pipCanvasElement.height = image.height;
+        pipDrawingContext.drawImage(image, 0, 0);
+        fps++;
+        const elapsed = new Date().getTime() - startTime;
+        if (elapsed > 5000) {
+            console.log(`fps: ${1000*fps/elapsed}`);
+            startTime = new Date().getTime();
+            fps = 0;
+        }
+    };
+
+    image.src = 'data:image/jpeg;base64,'+ Buffer.from(msg.data).toString('base64');
 };
 
-const image = document.createElement('img');
-image.onload = () => {
-  setInterval(drawImageOnPIP, 1000/30);
-};
-
-image.src = 'http://localhost:8081';
-
-setInterval(() => {
-  console.log(`fps: ${fps/period}`);
-  fps = 0;
-}, period * 1000);
+socket.addEventListener('message',  drawImageOnPIP);
 
 //new Cesium.CesiumInspector('inspector', scene);
 
 const videoElement : HTMLVideoElement = document.getElementsByTagName('video')[0];
 
 const state = {
-  positionPlaybackPaused: true,
-  videoPlaybackPaused: true,
-  showPursuit: false,
+    positionPlaybackPaused: true,
+    videoPlaybackPaused: true,
+    showPursuit: false,
 };
 
 const buttonBar = new ButtonBar();
@@ -82,7 +86,7 @@ buttonBar.addToggle<boolean>(
     ['Play Position Data', 'Pause Position Data'],
     [true, false],
     (value)=>{state.positionPlaybackPaused = value; }
-    );
+);
 
 buttonBar.addToggle<boolean>(
     ['Pursuit', 'Overhead'],
@@ -175,27 +179,27 @@ const pathPromise = generateCartographicGroundPath(terrainProvider, waypoints);
 
 Cesium.when(pathPromise, function(updatedCartographicPositions:Cesium.Cartographic[]) {
 
-  const pursuitCartesianPositions = generateAirPursuitPath(updatedCartographicPositions, initialPursuitPosition, 75, 200,300);
+    const pursuitCartesianPositions = generateAirPursuitPath(updatedCartographicPositions, initialPursuitPosition, 75, 200,300);
 
-  let pctr = 0;
-  setInterval(()=> {
-    if (state.positionPlaybackPaused) {
-        return;
-    }
+    let pctr = 0;
+    setInterval(()=> {
+        if (state.positionPlaybackPaused) {
+            return;
+        }
 
-    const cartographic = updatedCartographicPositions[pctr];
-    const cartesian = Cesium.Cartographic.toCartesian(cartographic);
+        const cartographic = updatedCartographicPositions[pctr];
+        const cartesian = Cesium.Cartographic.toCartesian(cartographic);
 
-    milkTruck.update(cartesian);
-    pursuitPlane.update(pursuitCartesianPositions[pctr]);
-    pursuitCamera.update(cartesian, pursuitCartesianPositions[pctr]);
-    pursuitBillboard.update(raiseCartesian(pursuitCartesianPositions[pctr], 0));
+        milkTruck.update(cartesian);
+        pursuitPlane.update(pursuitCartesianPositions[pctr]);
+        pursuitCamera.update(cartesian, pursuitCartesianPositions[pctr]);
+        pursuitBillboard.update(raiseCartesian(pursuitCartesianPositions[pctr], 0));
 
-    pctr++;
-    if (pctr >= updatedCartographicPositions.length-1) {
-      pctr = 0;
-    }
-  }, 1000/FPS);
+        pctr++;
+        if (pctr >= updatedCartographicPositions.length-1) {
+            pctr = 0;
+        }
+    }, 1000/FPS);
 
 });
 
@@ -221,7 +225,10 @@ Cesium.when(dataLoadedPromise, (rows:any[]) => {
 
 
 
-
+const counterWorker = new Worker('assets/webworkers/counter.js');
+counterWorker.onmessage = (msg) => {
+  console.log('msg from counter', msg);
+};
 
 
 
