@@ -18,14 +18,6 @@ import {VideoDrapedPolygon} from './VideoDrapedPolygon';
 import {VideoFollowCamera} from './VideoFollowCamera';
 import {ButtonBar} from './ButtonBar';
 
-const socket = new WebSocket('ws://localhost:8015');
-socket.binaryType = 'arraybuffer';
-
-// Connection opened
-socket.addEventListener('open', function (event) {
-    console.log('Opened connection to web socket server');
-});
-
 Cesium.Ion.defaultAccessToken = getToken();
 
 const terrainProvider = Cesium.createWorldTerrain();
@@ -47,29 +39,26 @@ const pipDrawingContext = pipCanvasElement.getContext('2d');
 
 let startTime = new Date().getTime();
 let fps = 0;
-const drawImageOnPIP = (msg: MessageEvent) => {
-    // console.log('Drawing image from message');
-    // console.log('msg.data:', msg.data);
+const drawImageOnPIP = (imageSrc: string) => {
 
-    const image = document.createElement('img');
+    const image = new Image();
 
     image.onload = () => {
+        // console.log('Drawing image');
         pipCanvasElement.width = image.width;
         pipCanvasElement.height = image.height;
         pipDrawingContext.drawImage(image, 0, 0);
         fps++;
         const elapsed = new Date().getTime() - startTime;
         if (elapsed > 5000) {
-            console.log(`fps: ${1000*fps/elapsed}`);
+            console.log(`fps: ${1000 * fps / elapsed}`);
             startTime = new Date().getTime();
             fps = 0;
         }
     };
 
-    image.src = 'data:image/jpeg;base64,'+ Buffer.from(msg.data).toString('base64');
+    image.src = imageSrc;
 };
-
-socket.addEventListener('message',  drawImageOnPIP);
 
 //new Cesium.CesiumInspector('inspector', scene);
 
@@ -225,9 +214,9 @@ Cesium.when(dataLoadedPromise, (rows:any[]) => {
 
 
 
-const counterWorker = new Worker('assets/webworkers/counter.js');
-counterWorker.onmessage = (msg) => {
-  console.log('msg from counter', msg);
+const imageProviderWorker = new Worker('assets/webworkers/image-provider.js');
+imageProviderWorker.onmessage = (msg) => {
+  drawImageOnPIP(msg.data);
 };
 
 
