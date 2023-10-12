@@ -1,0 +1,15 @@
+{
+  "name": "simple-2023",
+  "version": "1.0.0",
+  "description": "simple cesium usage in 2023",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "^3.0.3",
+    "serve": "^14.2.1"
+  }
+}
