@@ -2,7 +2,6 @@ import * as Cesium from 'cesium';
 
 import { calculateBearing } from './calculations';
 import { toCartographic } from './cesium-helpers';
-import { PositionProperty } from 'cesium';
 
 export class VelocityOrientedBillboard {
   position: Cesium.Cartesian3;
