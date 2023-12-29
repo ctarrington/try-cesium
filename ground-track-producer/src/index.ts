@@ -23,16 +23,18 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
 });
 
 // Fly the camera to San Francisco at the given longitude, latitude, and height.
-const initialLongitude = -76.90074;
-const initialLatitude = 39.165914;
+let currentDeltaLongitude = 0.00001;
+let currentDeltaLatitude = 0.00001;
+let currentLongitude = -76.90074;
+let currentLatitude = 39.165914;
 const cameraPosition = Cesium.Cartesian3.fromDegrees(
-  initialLongitude,
-  initialLatitude,
+  currentLongitude,
+  currentLatitude,
   300,
 );
 const targetPosition = Cesium.Cartesian3.fromDegrees(
-  initialLongitude,
-  initialLatitude,
+  currentLongitude,
+  currentLatitude,
   0,
 );
 const orientation = {
@@ -58,6 +60,32 @@ viewer.camera.flyTo({
   destination: cameraPosition,
   orientation,
 });
+
+setInterval(() => {
+  if (Math.random() > 0.998) {
+    currentDeltaLongitude = -currentDeltaLongitude;
+  }
+
+  if (Math.random() > 0.998) {
+    currentDeltaLatitude = -currentDeltaLatitude;
+  }
+
+  currentLatitude += currentDeltaLatitude;
+  currentLongitude += currentDeltaLongitude;
+  const targetPosition = Cesium.Cartesian3.fromDegrees(
+    currentLongitude,
+    currentLatitude,
+    0,
+  );
+  arrowBillboard.update(targetPosition);
+
+  const cameraPosition = Cesium.Cartesian3.fromDegrees(
+    currentLongitude,
+    currentLatitude,
+    300,
+  );
+  viewer.camera.setView({ destination: cameraPosition });
+}, 33);
 
 // todo: use map instead of terrain X
 // todo: add target at center of map - needs to be at lat lon X

@@ -2,6 +2,7 @@ import * as Cesium from 'cesium';
 
 import { calculateBearing } from './calculations';
 import { toCartographic } from './cesium-helpers';
+import { PositionProperty } from 'cesium';
 
 export class VelocityOrientedBillboard {
   position: Cesium.Cartesian3;
@@ -28,11 +29,15 @@ export class VelocityOrientedBillboard {
       width,
       height,
       eyeOffset: new Cesium.Cartesian3(0, 0, 0),
-      rotation: 0,
+      rotation: new Cesium.CallbackProperty(() => {
+        return this.rotation;
+      }, false) as any,
     });
 
     const entity = new Cesium.Entity({
-      position: this.position,
+      position: new Cesium.CallbackProperty(() => {
+        return this.position;
+      }, false) as any,
       billboard,
     });
 
