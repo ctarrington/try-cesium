@@ -1,8 +1,5 @@
 import * as Cesium from 'cesium';
 
-import { calculateBearing } from './calculations';
-import { toCartographic } from './cesium-helpers';
-
 export class OverheadCamera {
   viewer: Cesium.Viewer;
   position: Cesium.Cartesian3;
@@ -17,7 +14,6 @@ export class OverheadCamera {
   update(position: Cesium.Cartesian3) {
     this.previousPosition = this.position;
     this.position = position;
-
     this.viewer.camera.setView({
       destination: this.position,
       orientation: {

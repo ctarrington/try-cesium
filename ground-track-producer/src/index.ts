@@ -5,6 +5,7 @@ import '../src/css/main.css';
 import { ACCESS_TOKEN } from './dontcheckin';
 import { VelocityOrientedBillboard } from './VelocityOrientedBillboard';
 import { OverheadCamera } from './OverheadCamera';
+import { PathCalculator } from './PathCalculator';
 
 // Your access token can be found at: https://cesium.com/ion/tokens.
 // In this project, we're using a token stored in a separate file that is not checked in.
@@ -21,17 +22,26 @@ const baseLayer = new Cesium.ImageryLayer(
 const viewer = new Cesium.Viewer('cesiumContainer', {
   baseLayerPicker: false,
   baseLayer,
+  sceneModePicker: false,
+  sceneMode: Cesium.SceneMode.SCENE2D,
+  skyBox: false,
+  animation: false,
+  timeline: false,
+  fullscreenButton: false,
+  geocoder: false,
+  homeButton: false,
+  navigationHelpButton: false,
+  shouldAnimate: false,
+  targetFrameRate: 10,
 });
 
 // Fly the camera to San Francisco at the given longitude, latitude, and height.
-let currentDeltaLongitude = 0.00001;
-let currentDeltaLatitude = 0.00001;
 let currentLongitude = -76.90074;
 let currentLatitude = 39.165914;
 const cameraPosition = Cesium.Cartesian3.fromDegrees(
   currentLongitude,
   currentLatitude,
-  300,
+  100,
 );
 const targetPosition = Cesium.Cartesian3.fromDegrees(
   currentLongitude,
@@ -39,43 +49,41 @@ const targetPosition = Cesium.Cartesian3.fromDegrees(
   0,
 );
 
-const svgArrowLiteral = `<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
-    <path d="M 15 25 L 15 5 L 8 12 M 15 5 L 22 12" stroke="white" stroke-width="2" fill="none"/>
+const svgCircleLiteral = `<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="15" cy="15" r="13" stroke="white" stroke-width="2" fill="none"/>
 </svg>
 `;
-const arrowBillboard = new VelocityOrientedBillboard(
+const circleBillboard = new VelocityOrientedBillboard(
   viewer,
-  'data:image/svg+xml,' + encodeURIComponent(svgArrowLiteral),
+  'data:image/svg+xml,' + encodeURIComponent(svgCircleLiteral),
   Cesium.Color.RED,
   targetPosition,
-  50,
-  300,
+  200,
+  200,
 );
 
 const overheadCamera = new OverheadCamera(viewer, cameraPosition);
+const pathCalculator = new PathCalculator(
+  viewer.scene,
+  currentLongitude,
+  currentLatitude,
+);
 
 setInterval(() => {
-  if (Math.random() > 0.998) {
-    currentDeltaLongitude = -currentDeltaLongitude;
-  }
-
-  if (Math.random() > 0.998) {
-    currentDeltaLatitude = -currentDeltaLatitude;
-  }
-
-  currentLatitude += currentDeltaLatitude;
-  currentLongitude += currentDeltaLongitude;
+  pathCalculator.update();
+  currentLongitude = pathCalculator.getLongitude();
+  currentLatitude = pathCalculator.getLatitude();
   const targetPosition = Cesium.Cartesian3.fromDegrees(
     currentLongitude,
     currentLatitude,
     0,
   );
-  arrowBillboard.update(targetPosition);
+  circleBillboard.update(targetPosition);
 
   const cameraPosition = Cesium.Cartesian3.fromDegrees(
     currentLongitude,
     currentLatitude,
-    300,
+    100,
   );
   overheadCamera.update(cameraPosition);
 }, 33);
