@@ -1,4 +1,6 @@
 import * as Cesium from 'cesium';
+import { raiseCartesian, terrainCartesianFromScreen } from './cesium-helpers';
+import { Cartesian2 } from 'cesium';
 
 // colors based on open street map by sampling the colors from a map
 // no guarantee that these colors are long term stable
@@ -11,45 +13,48 @@ const largeRoadYellow = [248, 250, 191];
 const parkwayOrange = [252, 214, 164];
 const highwayRed = [230, 145, 161];
 
+const lookAheadDistance = 180;
+const sampleHeight = 5;
+
 export class PathCalculator {
-  currentLongitude: number;
-  currentLatitude: number;
-  previousLongitude: number;
-  previousLatitude: number;
+  altitude: number;
+  currentPosition: Cesium.Cartesian3;
+  previousPosition: Cesium.Cartesian3;
+  viewer: Cesium.Viewer;
   scene: Cesium.Scene;
-  radius: number;
   ctx2D: CanvasRenderingContext2D;
 
   constructor(
-    scene: Cesium.Scene,
+    viewer: Cesium.Viewer,
     initialLongitude: number,
     initialLatitude: number,
+    altitude: number,
   ) {
-    this.scene = scene;
-    this.currentLongitude = initialLongitude;
-    this.currentLatitude = initialLatitude;
-    this.previousLongitude = initialLongitude;
-    this.previousLatitude = initialLatitude;
+    this.viewer = viewer;
+    this.scene = viewer.scene;
+    this.altitude = altitude;
 
-    this.radius = 100;
+    this.currentPosition = Cesium.Cartesian3.fromDegrees(
+      initialLongitude,
+      initialLatitude,
+      altitude,
+    );
+    this.previousPosition = this.currentPosition;
+
     const canvas2D = document.createElement('canvas');
     canvas2D.style.top = '0px';
     canvas2D.style.left = '0px';
-    canvas2D.style.zIndex = '100';
     canvas2D.style.border = '1px solid black';
+    canvas2D.style.marginTop = '30px';
 
-    canvas2D.width = this.radius * 2;
-    canvas2D.height = this.radius * 2;
+    canvas2D.width = this.scene.canvas.width;
+    canvas2D.height = sampleHeight;
     this.ctx2D = canvas2D.getContext('2d');
     document.body.appendChild(canvas2D);
   }
 
-  getLongitude() {
-    return this.currentLongitude;
-  }
-
-  getLatitude() {
-    return this.currentLatitude;
+  getPosition() {
+    return this.currentPosition;
   }
 
   update() {
@@ -57,11 +62,8 @@ export class PathCalculator {
     const width = canvas.width;
     const height = canvas.height;
 
-    const radius = this.radius;
     const centerX = width / 2;
-    const centerY = height / 2;
-    const topLeftX = centerX - radius;
-    const topLeftY = centerY - radius;
+    const sampleY = height - lookAheadDistance - sampleHeight / 2;
 
     const removePostRender = this.scene.postRender.addEventListener(() => {
       removePostRender();
@@ -72,21 +74,28 @@ export class PathCalculator {
       setTimeout(() => {
         this.ctx2D.drawImage(
           image,
-          topLeftX,
-          topLeftY,
-          2 * radius,
-          2 * radius,
+          0,
+          sampleY,
+          width,
+          sampleHeight,
           0,
           0,
-          2 * radius,
-          2 * radius,
+          width,
+          sampleHeight,
         );
       }, 0);
     });
 
-    this.previousLongitude = this.currentLongitude;
-    this.previousLatitude = this.currentLatitude;
-    this.currentLongitude += 0.0;
-    this.currentLatitude += 0.0;
+    const offset = Math.random() > 0.9 ? 1 : 0;
+    const newGroundPosition = terrainCartesianFromScreen(
+      this.viewer,
+      new Cartesian2(centerX + offset, height - lookAheadDistance),
+    );
+
+    if (newGroundPosition) {
+      const newPosition = raiseCartesian(newGroundPosition, this.altitude);
+      this.previousPosition = this.currentPosition;
+      this.currentPosition = newPosition;
+    }
   }
 }

@@ -1,4 +1,6 @@
 import * as Cesium from 'cesium';
+import { toCartographic } from './cesium-helpers';
+import { calculateBearing } from './calculations';
 
 export class DriversViewCamera {
   viewer: Cesium.Viewer;
@@ -8,8 +10,7 @@ export class DriversViewCamera {
 
   constructor(
     viewer: Cesium.Viewer,
-    initialLongitude: number,
-    initialLatitude: number,
+    initialPosition: Cesium.Cartesian3,
     initialHeading: number,
   ) {
     this.viewer = viewer;
@@ -21,27 +22,24 @@ export class DriversViewCamera {
     });
     this.viewer.camera.frustum = frustrum;
 
-    const initialPosition = this.calculatePosition(
-      initialLongitude,
-      initialLatitude,
-    );
     this.position = initialPosition;
     this.previousPosition = initialPosition;
     this.heading = initialHeading;
   }
 
-  calculatePosition(currentLongitude: number, currentLatitude: number) {
-    return Cesium.Cartesian3.fromDegrees(currentLongitude, currentLatitude, 3);
-  }
-
-  update(longitude: number, latitude: number) {
+  update(destination: Cesium.Cartesian3) {
     this.previousPosition = this.position;
-    this.position = this.calculatePosition(longitude, latitude);
+    this.position = destination;
+
+    this.heading = calculateBearing(
+      toCartographic(this.previousPosition),
+      toCartographic(this.position),
+    );
     this.viewer.camera.setView({
-      destination: this.position,
+      destination,
       orientation: {
         heading: this.heading,
-        pitch: Cesium.Math.toRadians(-45),
+        pitch: Cesium.Math.toRadians(-65),
         roll: 0.0,
       },
     });
