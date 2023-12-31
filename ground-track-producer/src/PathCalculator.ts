@@ -23,6 +23,7 @@ export class PathCalculator {
   viewer: Cesium.Viewer;
   scene: Cesium.Scene;
   ctx2D: CanvasRenderingContext2D;
+  stearingOffset: number;
 
   constructor(
     viewer: Cesium.Viewer,
@@ -33,6 +34,7 @@ export class PathCalculator {
     this.viewer = viewer;
     this.scene = viewer.scene;
     this.altitude = altitude;
+    this.stearingOffset = 0;
 
     this.currentPosition = Cesium.Cartesian3.fromDegrees(
       initialLongitude,
@@ -41,8 +43,10 @@ export class PathCalculator {
     );
     this.previousPosition = this.currentPosition;
 
+    const top = this.scene.canvas.height - lookAheadDistance - sampleHeight / 2;
     const canvas2D = document.createElement('canvas');
-    canvas2D.style.top = '0px';
+    canvas2D.style.position = 'absolute';
+    canvas2D.style.top = '' + top + 'px';
     canvas2D.style.left = '0px';
     canvas2D.style.border = '1px solid black';
     canvas2D.style.marginTop = '30px';
@@ -86,10 +90,9 @@ export class PathCalculator {
       }, 0);
     });
 
-    const offset = Math.random() > 0.9 ? 1 : 0;
     const newGroundPosition = terrainCartesianFromScreen(
       this.viewer,
-      new Cartesian2(centerX + offset, height - lookAheadDistance),
+      new Cartesian2(centerX + this.stearingOffset, height - lookAheadDistance),
     );
 
     if (newGroundPosition) {

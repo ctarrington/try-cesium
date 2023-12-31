@@ -50,11 +50,14 @@ const driversViewCamera = new DriversViewCamera(
   Cesium.Math.toRadians(0),
 );
 
-setInterval(() => {
-  pathCalculator.update();
-  const position = pathCalculator.getPosition();
-  driversViewCamera.update(position);
-}, 1000 / 1);
+// let things settle down before we start updating the path and camera
+setTimeout(() => {
+  setInterval(() => {
+    pathCalculator.update();
+    const position = pathCalculator.getPosition();
+    driversViewCamera.update(position);
+  }, 1000 / 1);
+}, 1000);
 
 // todo: move the camera based on the screen coordinates of the next point
 // todo: get the camera to change bearing / heading based on the last two points
