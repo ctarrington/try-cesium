@@ -1,17 +1,7 @@
 import * as Cesium from 'cesium';
 import { raiseCartesian, terrainCartesianFromScreen } from './cesium-helpers';
 import { Cartesian2 } from 'cesium';
-
-// colors based on open street map by sampling the colors from a map
-// no guarantee that these colors are long term stable
-const outOfBoundsGray = [224, 223, 223];
-const outOfBoundsBrown = [243, 239, 233];
-const outOfBoundsGreen = [173, 209, 158];
-
-const smallRoadWhite = [255, 255, 255];
-const largeRoadYellow = [248, 250, 191];
-const parkwayOrange = [252, 214, 164];
-const highwayRed = [230, 145, 161];
+import { findRoad } from './path-calculations';
 
 const lookAheadDistance = 180;
 const sampleHeight = 5;
@@ -23,7 +13,7 @@ export class PathCalculator {
   viewer: Cesium.Viewer;
   scene: Cesium.Scene;
   ctx2D: CanvasRenderingContext2D;
-  stearingOffset: number;
+  stearingGoal: number;
 
   constructor(
     viewer: Cesium.Viewer,
@@ -34,7 +24,7 @@ export class PathCalculator {
     this.viewer = viewer;
     this.scene = viewer.scene;
     this.altitude = altitude;
-    this.stearingOffset = 0;
+    this.stearingGoal = this.scene.canvas.width / 2;
 
     this.currentPosition = Cesium.Cartesian3.fromDegrees(
       initialLongitude,
@@ -53,7 +43,7 @@ export class PathCalculator {
 
     canvas2D.width = this.scene.canvas.width;
     canvas2D.height = sampleHeight;
-    this.ctx2D = canvas2D.getContext('2d');
+    this.ctx2D = canvas2D.getContext('2d', { willReadFrequently: true });
     document.body.appendChild(canvas2D);
   }
 
@@ -73,7 +63,7 @@ export class PathCalculator {
       removePostRender();
       const image = new Image(width, height);
 
-      image.src = this.scene.canvas.toDataURL('image/jpeg', 0.2);
+      image.src = this.scene.canvas.toDataURL('image/jpeg', 1.0);
 
       setTimeout(() => {
         this.ctx2D.drawImage(
@@ -87,12 +77,27 @@ export class PathCalculator {
           width,
           sampleHeight,
         );
+
+        const data = this.ctx2D.getImageData(0, 0, width, sampleHeight).data;
+        const { leftIndex, rightIndex } = findRoad(data, width);
+        if (rightIndex && leftIndex) {
+          this.stearingGoal = (rightIndex + leftIndex) / 2;
+          this.ctx2D.fillRect(leftIndex, 0, 5, sampleHeight);
+          this.ctx2D.fillRect(rightIndex, 0, 5, sampleHeight);
+        }
       }, 0);
     });
 
+    let offset = this.stearingGoal - centerX;
+    if (offset > 0) {
+      offset = 1;
+    } else if (offset < 0) {
+      offset = -1;
+    }
+
     const newGroundPosition = terrainCartesianFromScreen(
       this.viewer,
-      new Cartesian2(centerX + this.stearingOffset, height - lookAheadDistance),
+      new Cartesian2(centerX + offset, height - lookAheadDistance),
     );
 
     if (newGroundPosition) {

@@ -52,16 +52,17 @@ const driversViewCamera = new DriversViewCamera(
 
 // let things settle down before we start updating the path and camera
 setTimeout(() => {
+  const startTime = Date.now();
   setInterval(() => {
-    pathCalculator.update();
+    if (Date.now() - startTime > 1000 * 4) {
+      pathCalculator.update();
+    }
     const position = pathCalculator.getPosition();
     driversViewCamera.update(position);
-  }, 1000 / 1);
-}, 1000);
+  }, 1000 / 10);
+}, 3000);
 
-// todo: move the camera based on the screen coordinates of the next point
-// todo: get the camera to change bearing / heading based on the last two points
-// todo: adjust the angle of the camera and fov until it is usable X
+// todo: adjust the angle of the camera and fov until it is usable
 // todo: clean up
 // todo: move the target but now stay in road
 // todo: if needed, process the image to make calculations easier or send it to a server to do the processing
