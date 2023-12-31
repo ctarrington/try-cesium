@@ -33,7 +33,6 @@ export class PathCalculator {
 
     this.radius = 100;
     const canvas2D = document.createElement('canvas');
-    canvas2D.style.position = 'absolute';
     canvas2D.style.top = '0px';
     canvas2D.style.left = '0px';
     canvas2D.style.zIndex = '100';
@@ -70,22 +69,24 @@ export class PathCalculator {
 
       image.src = this.scene.canvas.toDataURL('image/jpeg', 0.2);
 
-      this.ctx2D.drawImage(
-        image,
-        topLeftX,
-        topLeftY,
-        2 * radius,
-        2 * radius,
-        0,
-        0,
-        2 * radius,
-        2 * radius,
-      );
+      setTimeout(() => {
+        this.ctx2D.drawImage(
+          image,
+          topLeftX,
+          topLeftY,
+          2 * radius,
+          2 * radius,
+          0,
+          0,
+          2 * radius,
+          2 * radius,
+        );
+      }, 0);
     });
 
     this.previousLongitude = this.currentLongitude;
     this.previousLatitude = this.currentLatitude;
-    this.currentLongitude += 0.000001;
-    this.currentLatitude += 0.000001;
+    this.currentLongitude += 0.0;
+    this.currentLatitude += 0.0;
   }
 }

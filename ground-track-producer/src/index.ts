@@ -6,6 +6,7 @@ import { ACCESS_TOKEN } from './dontcheckin';
 import { VelocityOrientedBillboard } from './VelocityOrientedBillboard';
 import { OverheadCamera } from './OverheadCamera';
 import { PathCalculator } from './PathCalculator';
+import { DriversViewCamera } from './DriversViewCamera';
 
 // Your access token can be found at: https://cesium.com/ion/tokens.
 // In this project, we're using a token stored in a separate file that is not checked in.
@@ -23,7 +24,6 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
   baseLayerPicker: false,
   baseLayer,
   sceneModePicker: false,
-  sceneMode: Cesium.SceneMode.SCENE2D,
   skyBox: false,
   animation: false,
   timeline: false,
@@ -62,7 +62,12 @@ const circleBillboard = new VelocityOrientedBillboard(
   200,
 );
 
-const overheadCamera = new OverheadCamera(viewer, cameraPosition);
+const driversViewCamera = new DriversViewCamera(
+  viewer,
+  currentLongitude,
+  currentLatitude,
+  Cesium.Math.toRadians(0),
+);
 const pathCalculator = new PathCalculator(
   viewer.scene,
   currentLongitude,
@@ -80,14 +85,12 @@ setInterval(() => {
   );
   circleBillboard.update(targetPosition);
 
-  const cameraPosition = Cesium.Cartesian3.fromDegrees(
-    currentLongitude,
-    currentLatitude,
-    100,
-  );
-  overheadCamera.update(cameraPosition);
+  driversViewCamera.update(currentLongitude, currentLatitude);
 }, 33);
 
+// todo: move the camera based on the current heading
+// todo: adjust the angle of the camera and fov until it is usable
+// todo: clean up
 // todo: move the target but now stay in road
 // todo: if needed, process the image to make calculations easier or send it to a server to do the processing
 // todo: clean up controls - get rid of the cesium controls
