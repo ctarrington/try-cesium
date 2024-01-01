@@ -1,3 +1,5 @@
+// Utility functions for finding the road in a map image
+
 // colors based on open street map by sampling the colors from a map
 // no guarantee that these colors are long term stable
 const outOfBoundsGray = [224, 223, 223];
@@ -11,7 +13,7 @@ const outOfBoundsColors = [
   outOfBoundsPink,
 ];
 
-const smallRoadWhite = [255, 255, 255];
+// const smallRoadWhite = [255, 255, 255];
 const largeRoadYellow = [248, 250, 191];
 const parkwayOrange = [252, 214, 164];
 const highwayRed = [230, 145, 161];
@@ -23,7 +25,7 @@ enum SurfaceType {
   UNKNOWN,
 }
 
-// returns true if the color is within 5 of any of the specified colors
+// returns true if the color is close to any of the specified colors
 const includesColorMatch = (
   colors: number[][],
   data: Uint8ClampedArray,
@@ -75,12 +77,12 @@ export const findRoad = (
   let rightIndex: number | null = null;
 
   for (let columnIndex = 0; columnIndex < width; columnIndex++) {
-    const surfaceTupe = findSurfaceType(data, width, rowIndex, columnIndex);
-    if (!leftIndex && surfaceTupe === SurfaceType.ROAD) {
+    const surfaceType = findSurfaceType(data, width, rowIndex, columnIndex);
+    if (!leftIndex && surfaceType === SurfaceType.ROAD) {
       leftIndex = columnIndex;
     }
 
-    if (leftIndex && surfaceTupe === SurfaceType.OUT_OF_BOUNDS) {
+    if (leftIndex && surfaceType === SurfaceType.OUT_OF_BOUNDS) {
       rightIndex = columnIndex;
     }
 

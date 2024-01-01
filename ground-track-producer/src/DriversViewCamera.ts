@@ -2,6 +2,10 @@ import * as Cesium from 'cesium';
 import { toCartographic } from './cesium-helpers';
 import { calculateBearing } from './calculations';
 
+// A driver's view camera is a Cesium camera that looks at the road ahead based on the current and previous positions.
+
+const PITCH = -75;
+
 export class DriversViewCamera {
   viewer: Cesium.Viewer;
   position: Cesium.Cartesian3;
@@ -39,7 +43,7 @@ export class DriversViewCamera {
       destination,
       orientation: {
         heading: this.heading,
-        pitch: Cesium.Math.toRadians(-75),
+        pitch: Cesium.Math.toRadians(PITCH),
         roll: 0.0,
       },
     });

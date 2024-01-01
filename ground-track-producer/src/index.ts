@@ -6,9 +6,16 @@ import { ACCESS_TOKEN } from './dontcheckin';
 import { PathCalculator } from './PathCalculator';
 import { DriversViewCamera } from './DriversViewCamera';
 
+// Overall logic for the ground track producer.
+// A driver's view camera is updated with the current position and builds a view of the road ahead.
+// A path calculator uses the view of the road ahead to calculate the next position.
+// This module is responsible for the cesium setup and the animation loop
+
 // Your access token can be found at: https://cesium.com/ion/tokens.
 // In this project, we're using a token stored in a separate file that is not checked in.
 Cesium.Ion.defaultAccessToken = ACCESS_TOKEN;
+
+const FPS = 20;
 
 // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
 const baseLayer = new Cesium.ImageryLayer(
@@ -33,7 +40,6 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
   targetFrameRate: 10,
 });
 
-// Fly the camera to San Francisco at the given longitude, latitude, and height.
 let currentLongitude = -76.90074;
 let currentLatitude = 39.165914;
 
@@ -44,28 +50,21 @@ const pathCalculator = new PathCalculator(
   50,
 );
 
+// start with an initial heading of zero degrees
 const driversViewCamera = new DriversViewCamera(
   viewer,
   pathCalculator.getPosition(),
   Cesium.Math.toRadians(0),
 );
 
-// let things settle down before we start updating the path and camera
-setTimeout(() => {
-  const startTime = Date.now();
-  setInterval(() => {
-    if (Date.now() - startTime > 1000 * 4) {
-      pathCalculator.update();
-    }
-    const position = pathCalculator.getPosition();
-    driversViewCamera.update(position);
-  }, 1000 / 10);
-}, 3000);
+setInterval(() => {
+  pathCalculator.update();
+  const position = pathCalculator.getPosition();
+  driversViewCamera.update(position);
+}, 1000 / FPS);
 
-// todo: calculate the road by working inside out? or left to right?
-// todo: look at a point further ahead?
-// todo: stop and spin if there is no road ahead
+// todo: clean up, verify and tweak the constants
 // todo: source maps
-// todo: clean up
-// todo: if needed, process the image to make calculations easier or send it to a server to do the processing
-// todo: clean up controls - get rid of the cesium controls
+// todo: maybe drive on the right side of the road???
+// todo: stop and spin if there is no road ahead
+// todo: refactor to a set of folders - producer, server, consumer

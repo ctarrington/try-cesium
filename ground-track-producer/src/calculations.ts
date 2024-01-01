@@ -1,8 +1,7 @@
-// https://www.movable-type.co.uk/scripts/latlong.html
-
 import { Cartographic } from './types';
 
-const calculateBearing = (
+// adapted from https://www.movable-type.co.uk/scripts/latlong.html
+export const calculateBearing = (
   fromCartographic: Cartographic,
   toCartographic: Cartographic,
 ): number => {
@@ -20,4 +19,6 @@ const calculateBearing = (
   return bearing;
 };
 
-export { calculateBearing };
+export const clamp = (min: number, max: number, value: number) => {
+  return Math.min(Math.max(min, value), max);
+};
