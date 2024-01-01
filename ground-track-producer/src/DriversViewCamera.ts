@@ -39,7 +39,7 @@ export class DriversViewCamera {
       destination,
       orientation: {
         heading: this.heading,
-        pitch: Cesium.Math.toRadians(-65),
+        pitch: Cesium.Math.toRadians(-75),
         roll: 0.0,
       },
     });

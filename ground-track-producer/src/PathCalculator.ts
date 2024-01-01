@@ -3,8 +3,8 @@ import { raiseCartesian, terrainCartesianFromScreen } from './cesium-helpers';
 import { Cartesian2 } from 'cesium';
 import { findRoad } from './path-calculations';
 
-const lookAheadDistance = 180;
-const sampleHeight = 5;
+const lookAheadDistance = 250;
+const sampleHeight = 1;
 
 export class PathCalculator {
   altitude: number;
@@ -90,9 +90,9 @@ export class PathCalculator {
 
     let offset = this.stearingGoal - centerX;
     if (offset > 0) {
-      offset = 1;
+      offset = 2;
     } else if (offset < 0) {
-      offset = -1;
+      offset = -2;
     }
 
     const newGroundPosition = terrainCartesianFromScreen(

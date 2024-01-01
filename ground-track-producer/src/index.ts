@@ -41,7 +41,7 @@ const pathCalculator = new PathCalculator(
   viewer,
   currentLongitude,
   currentLatitude,
-  10,
+  50,
 );
 
 const driversViewCamera = new DriversViewCamera(
