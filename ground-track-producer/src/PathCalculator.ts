@@ -4,7 +4,8 @@ import { Cartesian2 } from 'cesium';
 import { findRoad } from './path-calculations';
 
 const lookAheadDistance = 250;
-const sampleHeight = 1;
+const sampleHeight = 120;
+const maxOffset = 4;
 
 export class PathCalculator {
   altitude: number;
@@ -14,6 +15,7 @@ export class PathCalculator {
   scene: Cesium.Scene;
   ctx2D: CanvasRenderingContext2D;
   stearingGoal: number;
+  readyToMove: boolean;
 
   constructor(
     viewer: Cesium.Viewer,
@@ -25,6 +27,7 @@ export class PathCalculator {
     this.scene = viewer.scene;
     this.altitude = altitude;
     this.stearingGoal = this.scene.canvas.width / 2;
+    this.readyToMove = false;
 
     this.currentPosition = Cesium.Cartesian3.fromDegrees(
       initialLongitude,
@@ -38,7 +41,8 @@ export class PathCalculator {
     canvas2D.style.position = 'absolute';
     canvas2D.style.top = '' + top + 'px';
     canvas2D.style.left = '0px';
-    canvas2D.style.border = '1px solid black';
+    canvas2D.style.borderTop = '1px solid black';
+    canvas2D.style.borderBottom = '1px solid black';
     canvas2D.style.marginTop = '30px';
 
     canvas2D.width = this.scene.canvas.width;
@@ -79,31 +83,40 @@ export class PathCalculator {
         );
 
         const data = this.ctx2D.getImageData(0, 0, width, sampleHeight).data;
-        const { leftIndex, rightIndex } = findRoad(data, width);
-        if (rightIndex && leftIndex) {
-          this.stearingGoal = (rightIndex + leftIndex) / 2;
-          this.ctx2D.fillRect(leftIndex, 0, 5, sampleHeight);
-          this.ctx2D.fillRect(rightIndex, 0, 5, sampleHeight);
+
+        let stearingGoal = this.stearingGoal;
+        this.readyToMove = false;
+        for (let rowIndex = sampleHeight - 1; rowIndex >= 0; rowIndex--) {
+          const { leftIndex, rightIndex } = findRoad(data, width, rowIndex);
+          if (rightIndex && leftIndex) {
+            stearingGoal = leftIndex;
+            this.readyToMove = true;
+            this.ctx2D.fillRect(leftIndex, rowIndex, 1, 1);
+            this.ctx2D.fillRect(rightIndex, rowIndex, 1, 1);
+          }
         }
+        this.stearingGoal = stearingGoal;
       }, 0);
     });
 
     let offset = this.stearingGoal - centerX;
     if (offset > 0) {
-      offset = 2;
+      offset = Math.min(maxOffset, offset);
     } else if (offset < 0) {
-      offset = -2;
+      offset = Math.max(-maxOffset, offset);
     }
 
-    const newGroundPosition = terrainCartesianFromScreen(
-      this.viewer,
-      new Cartesian2(centerX + offset, height - lookAheadDistance),
-    );
+    if (this.readyToMove) {
+      const newGroundPosition = terrainCartesianFromScreen(
+        this.viewer,
+        new Cartesian2(centerX + offset, height - lookAheadDistance),
+      );
 
-    if (newGroundPosition) {
-      const newPosition = raiseCartesian(newGroundPosition, this.altitude);
-      this.previousPosition = this.currentPosition;
-      this.currentPosition = newPosition;
+      if (newGroundPosition) {
+        const newPosition = raiseCartesian(newGroundPosition, this.altitude);
+        this.previousPosition = this.currentPosition;
+        this.currentPosition = newPosition;
+      }
     }
   }
 }

@@ -62,8 +62,10 @@ setTimeout(() => {
   }, 1000 / 10);
 }, 3000);
 
-// todo: adjust the angle of the camera and fov until it is usable
+// todo: calculate the road by working inside out? or left to right?
+// todo: look at a point further ahead?
+// todo: stop and spin if there is no road ahead
+// todo: source maps
 // todo: clean up
-// todo: move the target but now stay in road
 // todo: if needed, process the image to make calculations easier or send it to a server to do the processing
 // todo: clean up controls - get rid of the cesium controls
