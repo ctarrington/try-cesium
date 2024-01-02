@@ -15,8 +15,7 @@ export const calculateBearing = (
   const x =
     Math.cos(lat1) * Math.sin(lat2) -
     Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
-  const bearing = Math.atan2(y, x);
-  return bearing;
+  return Math.atan2(y, x);
 };
 
 export const clamp = (min: number, max: number, value: number) => {

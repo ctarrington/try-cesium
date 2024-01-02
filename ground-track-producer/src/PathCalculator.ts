@@ -1,5 +1,9 @@
 import * as Cesium from 'cesium';
-import { raiseCartesian, terrainCartesianFromScreen } from './cesium-helpers';
+import {
+  raiseCartesian,
+  terrainCartesianFromScreen,
+  toCartographic,
+} from './cesium-helpers';
 import { Cartesian2 } from 'cesium';
 import { findRoad } from './path-calculations';
 import { clamp } from './calculations';
@@ -18,6 +22,8 @@ export class PathCalculator {
   currentPosition: Cesium.Cartesian3;
   viewer: Cesium.Viewer;
   ctx2D: CanvasRenderingContext2D;
+  latitudeDiv: HTMLSpanElement;
+  longitudeDiv: HTMLSpanElement;
   steeringGoal: number;
   readyToMove: boolean;
 
@@ -51,6 +57,11 @@ export class PathCalculator {
     canvas2D.height = sampleHeight;
     this.ctx2D = canvas2D.getContext('2d', { willReadFrequently: true });
     document.body.appendChild(canvas2D);
+
+    this.latitudeDiv = document.createElement('div');
+    this.longitudeDiv = document.createElement('div');
+    document.body.appendChild(this.latitudeDiv);
+    document.body.appendChild(this.longitudeDiv);
   }
 
   getPosition() {
@@ -96,7 +107,7 @@ export class PathCalculator {
           for (let rowIndex = sampleHeight - 1; rowIndex >= 0; rowIndex--) {
             const { leftIndex, rightIndex } = findRoad(data, width, rowIndex);
             if (rightIndex && leftIndex) {
-              steeringGoal = leftIndex;
+              steeringGoal = rightIndex;
               this.readyToMove = true;
               this.ctx2D.fillRect(leftIndex, rowIndex, 1, 1);
               this.ctx2D.fillRect(rightIndex, rowIndex, 1, 1);
@@ -118,6 +129,15 @@ export class PathCalculator {
 
       if (newGroundPosition) {
         this.currentPosition = raiseCartesian(newGroundPosition, this.altitude);
+        const cartographic = toCartographic(this.currentPosition);
+        this.latitudeDiv.innerText =
+          'Latitude: ' +
+          Cesium.Math.toDegrees(cartographic.latitude).toFixed(6) +
+          ' ';
+        this.longitudeDiv.innerText =
+          'Longitude: ' +
+          Cesium.Math.toDegrees(cartographic.longitude).toFixed(6) +
+          ' ';
       }
     }
   }

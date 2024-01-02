@@ -20,11 +20,10 @@ export class DriversViewCamera {
     this.viewer = viewer;
 
     const aspectRatio = viewer.canvas.clientWidth / viewer.canvas.clientHeight;
-    const frustrum = new Cesium.PerspectiveFrustum({
+    this.viewer.camera.frustum = new Cesium.PerspectiveFrustum({
       fov: Cesium.Math.PI_OVER_TWO,
       aspectRatio,
     });
-    this.viewer.camera.frustum = frustrum;
 
     this.position = initialPosition;
     this.previousPosition = initialPosition;

@@ -5,19 +5,26 @@
 const outOfBoundsGray = [224, 223, 223];
 const outOfBoundsBrown = [243, 239, 233];
 const outOfBoundsGreen = [173, 209, 158];
+const outOfBoundsYellow = [238, 240, 213];
+const outOfBoundsYellow2 = [255, 255, 229];
 const outOfBoundsPink = [242, 218, 218];
+const outOfBoundsPink2 = [255, 214, 210];
 const outOfBoundsColors = [
   outOfBoundsGray,
   outOfBoundsBrown,
   outOfBoundsGreen,
+  outOfBoundsYellow,
+  outOfBoundsYellow2,
   outOfBoundsPink,
+  outOfBoundsPink2,
 ];
 
 // const smallRoadWhite = [255, 255, 255];
 const largeRoadYellow = [248, 250, 191];
 const parkwayOrange = [252, 214, 164];
+const parkwayOrange2 = [249, 178, 156];
 const highwayRed = [230, 145, 161];
-const roadColors = [largeRoadYellow, parkwayOrange, highwayRed];
+const roadColors = [largeRoadYellow, parkwayOrange, parkwayOrange2, highwayRed];
 
 enum SurfaceType {
   ROAD = 1,
@@ -76,14 +83,14 @@ export const findRoad = (
   let leftIndex: number | null = null;
   let rightIndex: number | null = null;
 
-  for (let columnIndex = 0; columnIndex < width; columnIndex++) {
+  for (let columnIndex = width - 1; columnIndex > 0; columnIndex--) {
     const surfaceType = findSurfaceType(data, width, rowIndex, columnIndex);
-    if (!leftIndex && surfaceType === SurfaceType.ROAD) {
-      leftIndex = columnIndex;
+    if (!rightIndex && surfaceType === SurfaceType.ROAD) {
+      rightIndex = columnIndex;
     }
 
-    if (leftIndex && surfaceType === SurfaceType.OUT_OF_BOUNDS) {
-      rightIndex = columnIndex;
+    if (rightIndex && surfaceType === SurfaceType.OUT_OF_BOUNDS) {
+      leftIndex = columnIndex;
     }
 
     if (leftIndex && rightIndex) {

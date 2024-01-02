@@ -3,6 +3,16 @@ import * as Cesium from 'cesium';
 import { calculateBearing } from './calculations';
 import { toCartographic } from './cesium-helpers';
 
+// A velocity oriented billboard is a billboard that rotates to face the direction of travel.
+
+const svgArrowLiteral = `
+<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+    <path d="M 15 25 L 15 5 L 8 12 M 15 5 L 22 12" stroke="white" stroke-width="2" fill="none"/>
+</svg>
+`;
+
+const svgArrowURL = 'data:image/svg+xml,' + encodeURIComponent(svgArrowLiteral);
+
 export class VelocityOrientedBillboard {
   position: Cesium.Cartesian3;
   previousPosition: Cesium.Cartesian3;
@@ -10,11 +20,11 @@ export class VelocityOrientedBillboard {
 
   constructor(
     viewer: Cesium.Viewer,
-    url: string,
-    color: Cesium.Color = Cesium.Color.WHITE,
     initialPosition: Cesium.Cartesian3,
     width: number = 25,
     height = 25,
+    color: Cesium.Color = Cesium.Color.WHITE,
+    url = svgArrowURL,
   ) {
     this.position = initialPosition;
     this.previousPosition = initialPosition;

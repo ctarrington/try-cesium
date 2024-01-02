@@ -40,6 +40,7 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
   targetFrameRate: 10,
 });
 
+// Sanner Road, Columbia, MD
 let currentLongitude = -76.90074;
 let currentLatitude = 39.165914;
 
@@ -63,8 +64,11 @@ setInterval(() => {
   driversViewCamera.update(position);
 }, 1000 / FPS);
 
-// todo: clean up, verify and tweak the constants
+// todo: add an overhead view with a wide field of view and billboards for the path
 // todo: source maps
-// todo: maybe drive on the right side of the road???
 // todo: stop and spin if there is no road ahead
-// todo: refactor to a set of folders - producer, server, consumer
+// todo: take the middle road from the list of roads
+// todo: enter a new starting position
+// todo: download waypoints
+// todo: host on github pages
+// todo: move to anthem and refactor to a set of folders - producer, server, consumer
