@@ -68,6 +68,10 @@ export class PathCalculator {
     return this.currentPosition;
   }
 
+  getReadyToMove() {
+    return this.readyToMove;
+  }
+
   update() {
     const canvas = this.viewer.scene.canvas;
     const width = canvas.width;

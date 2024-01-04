@@ -85,25 +85,28 @@ let tick = 0;
 setInterval(() => {
   pathCalculator.update();
   const position = pathCalculator.getPosition();
+
   driversViewCamera.update(position);
   vehicle.update(position);
+
   if (tick % 111 === 0) {
     const cartographic = Cesium.Cartographic.fromCartesian(position);
     currentLongitude = Cesium.Math.toDegrees(cartographic.longitude);
     currentLatitude = Cesium.Math.toDegrees(cartographic.latitude);
-    overheadViewer.scene.camera.setView({
-      destination: Cesium.Cartesian3.fromDegrees(
-        currentLongitude,
-        currentLatitude,
-        overheadAltitude,
-      ),
-    });
 
-    dropBreadcrumb(overheadViewer, position);
+    if (pathCalculator.getReadyToMove()) {
+      overheadViewer.scene.camera.setView({
+        destination: Cesium.Cartesian3.fromDegrees(
+          currentLongitude,
+          currentLatitude,
+          overheadAltitude,
+        ),
+      });
+      dropBreadcrumb(overheadViewer, position);
+    }
   }
 }, 1000 / FPS);
 
-// todo: release the camera when stopped
 // todo: stabilize the path
 // todo: stop and spin if there is no road ahead
 // todo: take the middle road from a list of roads
