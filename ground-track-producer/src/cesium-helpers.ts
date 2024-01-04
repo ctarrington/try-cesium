@@ -1,21 +1,25 @@
 import * as Cesium from 'cesium';
 
-const toCartographic = (cartesian: Cesium.Cartesian3): Cesium.Cartographic => {
+export const toCartographic = (
+  cartesian: Cesium.Cartesian3,
+): Cesium.Cartographic => {
   return Cesium.Cartographic.fromCartesian(cartesian);
 };
 
-const toCartesian = (cartographic: Cesium.Cartographic): Cesium.Cartesian3 => {
+export const toCartesian = (
+  cartographic: Cesium.Cartographic,
+): Cesium.Cartesian3 => {
   return Cesium.Cartographic.toCartesian(cartographic);
 };
 
-const subtractCartesians = (
+export const subtractCartesians = (
   to: Cesium.Cartesian3,
   from: Cesium.Cartesian3,
 ): Cesium.Cartesian3 => {
   return Cesium.Cartesian3.subtract(to, from, new Cesium.Cartesian3(0, 0, 0));
 };
 
-const subtractCartographics = (
+export const subtractCartographics = (
   to: Cesium.Cartographic,
   from: Cesium.Cartographic,
 ): Cesium.Cartesian3 => {
@@ -26,14 +30,14 @@ const subtractCartographics = (
   );
 };
 
-const addCartesians = (
+export const addCartesians = (
   first: Cesium.Cartesian3,
   second: Cesium.Cartesian3,
 ): Cesium.Cartesian3 => {
   return Cesium.Cartesian3.add(first, second, new Cesium.Cartesian3(0, 0, 0));
 };
 
-const multiplyByScalar = (
+export const multiplyByScalar = (
   cartesian: Cesium.Cartesian3,
   scalar: number,
 ): Cesium.Cartesian3 => {
@@ -44,18 +48,18 @@ const multiplyByScalar = (
   );
 };
 
-const normalize = (cartesian: Cesium.Cartesian3): Cesium.Cartesian3 => {
+export const normalize = (cartesian: Cesium.Cartesian3): Cesium.Cartesian3 => {
   return Cesium.Cartesian3.normalize(cartesian, new Cesium.Cartesian3(0, 0, 0));
 };
 
-const raiseCartographic = (
+export const raiseCartographic = (
   original: Cesium.Cartographic,
   height: number,
 ): Cesium.Cartographic => {
   return new Cesium.Cartographic(original.longitude, original.latitude, height);
 };
 
-const raiseCartesian = (
+export const raiseCartesian = (
   original: Cesium.Cartesian3,
   height: number,
 ): Cesium.Cartesian3 => {
@@ -66,14 +70,14 @@ const raiseCartesian = (
   return toCartesian(raisedCartographic);
 };
 
-const cross = (
+export const cross = (
   first: Cesium.Cartesian3,
   second: Cesium.Cartesian3,
 ): Cesium.Cartesian3 => {
   return Cesium.Cartesian3.cross(first, second, new Cesium.Cartesian3(0, 0, 0));
 };
 
-const terrainCartesianFromScreen = (
+export const terrainCartesianFromScreen = (
   viewer: Cesium.Viewer,
   screen: Cesium.Cartesian2,
 ) => {
@@ -81,9 +85,9 @@ const terrainCartesianFromScreen = (
   return viewer.scene.globe.pick(ray, viewer.scene);
 };
 
-const toDegrees = Cesium.Math.toDegrees;
+export const toDegrees = Cesium.Math.toDegrees;
 
-const combine = (
+export const combine = (
   first: Cesium.Cartesian3,
   second: Cesium.Cartesian3,
   alpha: number,
@@ -94,31 +98,27 @@ const combine = (
   return addCartesians(firstScaled, secondScaled);
 };
 
-const cartesianMidpoint = (
+export const cartesianMidpoint = (
   first: Cesium.Cartesian3,
   second: Cesium.Cartesian3,
 ) => {
   return combine(first, second, 0.5);
 };
 
-const clamp = (min: number, max: number, value: number) => {
+export const clamp = (min: number, max: number, value: number) => {
   return Math.min(Math.max(min, value), max);
 };
 
-export {
-  addCartesians,
-  cartesianMidpoint,
-  clamp,
-  combine,
-  cross,
-  multiplyByScalar,
-  normalize,
-  raiseCartesian,
-  raiseCartographic,
-  subtractCartesians,
-  subtractCartographics,
-  terrainCartesianFromScreen,
-  toCartesian,
-  toCartographic,
-  toDegrees,
+export const dropBreadcrumb = (
+  viewer: Cesium.Viewer,
+  position: Cesium.Cartesian3,
+) => {
+  const entity = new Cesium.Entity({
+    position,
+    point: {
+      pixelSize: 5,
+      color: Cesium.Color.RED,
+    },
+  });
+  viewer.entities.add(entity);
 };

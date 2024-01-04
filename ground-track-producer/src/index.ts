@@ -6,6 +6,7 @@ import { ACCESS_TOKEN } from './dontcheckin';
 import { PathCalculator } from './PathCalculator';
 import { DriversViewCamera } from './DriversViewCamera';
 import { VelocityOrientedBillboard } from './VelocityOrientedBillboard';
+import { dropBreadcrumb } from './cesium-helpers';
 
 // Overall logic for the ground track producer.
 // A driver's view camera is updated with the current position and builds a view of the road ahead.
@@ -97,11 +98,13 @@ setInterval(() => {
         overheadAltitude,
       ),
     });
+
+    dropBreadcrumb(overheadViewer, position);
   }
 }, 1000 / FPS);
 
-// todo: add an overhead view with a wide field of view and billboards for the path
-// todo: source maps
+// todo: release the camera when stopped
+// todo: stabilize the path
 // todo: stop and spin if there is no road ahead
 // todo: take the middle road from a list of roads
 // todo: enter a new starting position
