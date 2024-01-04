@@ -6,9 +6,12 @@ html, body  {
 	overflow: hidden;
 }
 
-#cesiumContainer {
+#driversViewContainer, #overheadViewContainer {
 	width: 600px;
 	height: 600px;
 	margin: 0;
 	padding: 0;
+}
+
+#driversViewContainer {
 }
