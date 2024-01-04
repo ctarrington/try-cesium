@@ -11,6 +11,7 @@ module.exports = {
   entry: {
     app: './src/index.ts',
   },
+  devtool: 'inline-source-map',
   output: {
     filename: 'app.js',
     path: path.resolve(__dirname, 'dist'),
