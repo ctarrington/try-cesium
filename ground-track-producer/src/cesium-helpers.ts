@@ -112,12 +112,13 @@ export const clamp = (min: number, max: number, value: number) => {
 export const dropBreadcrumb = (
   viewer: Cesium.Viewer,
   position: Cesium.Cartesian3,
+  color: Cesium.Color,
 ) => {
   const entity = new Cesium.Entity({
     position,
     point: {
       pixelSize: 5,
-      color: Cesium.Color.RED,
+      color,
     },
   });
   viewer.entities.add(entity);
