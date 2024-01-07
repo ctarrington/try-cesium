@@ -1,4 +1,5 @@
 import { Cartographic } from './types';
+import * as Cesium from 'cesium';
 
 // adapted from https://www.movable-type.co.uk/scripts/latlong.html
 export const calculateBearing = (
@@ -20,4 +21,15 @@ export const calculateBearing = (
 
 export const clamp = (min: number, max: number, value: number) => {
   return Math.min(Math.max(min, value), max);
+};
+
+export const calculateSpeedInMPH = (
+  initialPosition: Cesium.Cartesian3,
+  finalPosition: Cesium.Cartesian3,
+  elapsed: number,
+) => {
+  const meters = Cesium.Cartesian3.distance(initialPosition, finalPosition);
+  const miles = meters * 0.000621371;
+  const hours = elapsed / 1000 / 60 / 60;
+  return miles / hours;
 };

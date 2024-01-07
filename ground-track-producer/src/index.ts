@@ -12,6 +12,8 @@ import { AirPursuitPathCalculator } from './AirPursuitPathCalculator';
 // Overall logic for the ground track producer.
 // A driver's view camera is updated with the current position and builds a view of the road ahead.
 // A path calculator uses the view of the road ahead to calculate the next position.
+// The overhead view slowly follows the current position of the vehicle. It also shows the air pursuit path.
+
 // This module is responsible for the cesium setup and the animation loop
 
 // Your access token can be found at: https://cesium.com/ion/tokens.
@@ -22,7 +24,6 @@ const FPS = 10;
 const overheadAltitude = 5000;
 const pursuitAltitude = 1000;
 
-// Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
 const baseLayer = new Cesium.ImageryLayer(
   new Cesium.OpenStreetMapImageryProvider({
     url: 'https://tile.openstreetmap.org/',
@@ -67,7 +68,6 @@ const airPursuitPathCalculator = new AirPursuitPathCalculator(
   20,
   1000,
   1500,
-  roadFollowingPathCalculator.getPosition(),
 );
 
 // start with an initial heading of zero degrees

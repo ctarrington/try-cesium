@@ -5,17 +5,16 @@ import {
   cross,
   multiplyByScalar,
   normalize,
-  raiseCartographic,
+  raiseCartesian,
   subtractCartesians,
-  toCartesian,
-  toCartographic,
 } from './cesium-helpers';
 
 // An air pursuit path calculator calculates the next position by pursuing a target while trying to maintain a
-// specified distance away from the target.
+// specified distance away from the target. It determines the direction to the target and then combines that with
+// a tangent to the circle around the target to determine the next position. The distance from the target is used to adjust
+// the weight of the two components.
 
 export class AirPursuitPathCalculator {
-  targetPosition: Cesium.Cartesian3;
   currentPosition: Cesium.Cartesian3;
   speedInMetersPerSecond: number;
   altitude: number;
@@ -23,17 +22,15 @@ export class AirPursuitPathCalculator {
 
   normalMode: boolean;
   distanceDiv: HTMLDivElement;
-  private lastUpdateTime: number;
+  lastUpdateTime: number;
 
   constructor(
     initialPosition: Cesium.Cartesian3,
     speedInMetersPerSecond: number,
     altitude: number,
     goalDistance: number,
-    initialTargetPosition: Cesium.Cartesian3,
   ) {
     this.currentPosition = initialPosition;
-    this.targetPosition = initialTargetPosition;
     this.speedInMetersPerSecond = speedInMetersPerSecond;
     this.altitude = altitude;
     this.goalDistance = goalDistance;
@@ -51,12 +48,7 @@ export class AirPursuitPathCalculator {
   }
 
   update(targetGroundPosition: Cesium.Cartesian3) {
-    const targetCartographic = toCartographic(targetGroundPosition);
-    const cartographicRaisedTarget = raiseCartographic(
-      targetCartographic,
-      this.altitude,
-    );
-    const targetCartesian = toCartesian(cartographicRaisedTarget);
+    const targetCartesian = raiseCartesian(targetGroundPosition, this.altitude);
     const distance = Cesium.Cartesian3.distance(
       targetCartesian,
       this.currentPosition,
