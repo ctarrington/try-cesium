@@ -6,8 +6,9 @@ import { ACCESS_TOKEN } from './dontcheckin';
 import { RoadFollowingPathCalculator } from './RoadFollowingPathCalculator';
 import { DriversViewCamera } from './DriversViewCamera';
 import { VelocityOrientedBillboard } from './VelocityOrientedBillboard';
-import { dropBreadcrumb } from './cesium-helpers';
+import { dropBreadcrumb, raiseCartesian } from './cesium-helpers';
 import { AirPursuitPathCalculator } from './AirPursuitPathCalculator';
+import { PursuitViewCamera } from './PursuitViewCamera';
 
 // Overall logic for the ground track producer.
 // A driver's view camera is updated with the current position and builds a view of the road ahead.
@@ -20,7 +21,7 @@ import { AirPursuitPathCalculator } from './AirPursuitPathCalculator';
 // In this project, we're using a token stored in a separate file that is not checked in.
 Cesium.Ion.defaultAccessToken = ACCESS_TOKEN;
 
-const FPS = 10;
+const FPS = 5;
 const overheadAltitude = 5000;
 const pursuitAltitude = 1000;
 
@@ -47,6 +48,21 @@ const driversViewer = new Cesium.Viewer('driversViewContainer', {
 });
 
 const overheadViewer = new Cesium.Viewer('overheadViewContainer', {});
+
+const pursuitViewer = new Cesium.Viewer('pursuitViewContainer', {
+  baseLayerPicker: false,
+  sceneModePicker: false,
+  skyBox: false,
+  animation: false,
+  timeline: false,
+  fullscreenButton: false,
+  geocoder: false,
+  homeButton: false,
+  navigationHelpButton: false,
+  shouldAnimate: false,
+  targetFrameRate: 10,
+});
+
 // Sanner Road, Columbia, MD
 let currentLongitude = -76.90074;
 let currentLatitude = 39.165914;
@@ -77,6 +93,8 @@ const driversViewCamera = new DriversViewCamera(
   Cesium.Math.toRadians(0),
 );
 
+const pursuitViewCamera = new PursuitViewCamera(pursuitViewer);
+
 const overheadCamera = overheadViewer.scene.camera;
 overheadCamera.setView({
   destination: Cesium.Cartesian3.fromDegrees(
@@ -96,11 +114,18 @@ const vehicle = new VelocityOrientedBillboard(
   roadFollowingPathCalculator.getPosition(),
 );
 
+const vehicle2 = new VelocityOrientedBillboard(
+  pursuitViewer,
+  roadFollowingPathCalculator.getPosition(),
+  50,
+  50,
+);
+
 const aircraft = new VelocityOrientedBillboard(
   overheadViewer,
   airPursuitPathCalculator.getPosition(),
-  25,
-  25,
+  50,
+  50,
   Cesium.Color.BLUE,
 );
 
@@ -112,7 +137,10 @@ setInterval(() => {
   airPursuitPathCalculator.update(position);
   driversViewCamera.update(position);
   vehicle.update(position);
+  vehicle2.update(position);
   aircraft.update(airPursuitPathCalculator.getPosition());
+
+  pursuitViewCamera.update(airPursuitPathCalculator.getPosition(), position);
 
   if (tick % 111 === 0) {
     const cartographic = Cesium.Cartographic.fromCartesian(position);
@@ -127,10 +155,10 @@ setInterval(() => {
           overheadAltitude,
         ),
       });
-      dropBreadcrumb(overheadViewer, position, Cesium.Color.RED);
+      dropBreadcrumb(overheadViewer, position, Cesium.Color.WHITE);
       dropBreadcrumb(
         overheadViewer,
-        airPursuitPathCalculator.getPosition(),
+        raiseCartesian(airPursuitPathCalculator.getPosition(), 0),
         Cesium.Color.BLUE,
       );
     }

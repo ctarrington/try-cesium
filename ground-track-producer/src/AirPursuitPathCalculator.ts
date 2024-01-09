@@ -70,7 +70,7 @@ export class AirPursuitPathCalculator {
     );
     Cesium.Cartesian3.add(this.currentPosition, progress, this.currentPosition);
 
-    this.distanceDiv.innerText = 'Distance: ' + distance.toFixed(2);
+    this.distanceDiv.innerText = 'Distance: ' + distance.toFixed(2) + ' meters';
     this.lastUpdateTime = Date.now();
   }
 }

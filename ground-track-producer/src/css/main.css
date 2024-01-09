@@ -6,7 +6,7 @@ html, body  {
 	overflow: hidden;
 }
 
-#driversViewContainer, #overheadViewContainer {
+#driversViewContainer, #overheadViewContainer, #pursuitViewContainer {
 	width: 600px;
 	height: 600px;
 	margin: 0;

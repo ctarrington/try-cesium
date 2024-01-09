@@ -1,7 +1,7 @@
 import * as Cesium from 'cesium';
 
 import { calculateBearing } from './calculations';
-import { toCartographic } from './cesium-helpers';
+import { raiseCartesian, toCartographic } from './cesium-helpers';
 
 // A velocity oriented billboard is a billboard that rotates to face the direction of travel.
 
@@ -55,7 +55,7 @@ export class VelocityOrientedBillboard {
 
   update(position: Cesium.Cartesian3) {
     this.previousPosition = this.position;
-    this.position = position;
+    this.position = raiseCartesian(position, 0);
     this.rotation = -calculateBearing(
       toCartographic(this.previousPosition),
       toCartographic(this.position),

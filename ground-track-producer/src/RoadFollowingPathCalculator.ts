@@ -154,7 +154,8 @@ export class RoadFollowingPathCalculator {
             previousPosition,
             this.currentPosition,
             Date.now() - this.lastUpdateTime,
-          ).toFixed(2);
+          ).toFixed(2) +
+          ' mph';
 
         this.lastUpdateTime = Date.now();
       }
