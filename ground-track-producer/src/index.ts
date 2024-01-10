@@ -9,6 +9,7 @@ import { VelocityOrientedBillboard } from './VelocityOrientedBillboard';
 import { dropBreadcrumb, raiseCartesian } from './cesium-helpers';
 import { AirPursuitPathCalculator } from './AirPursuitPathCalculator';
 import { PursuitViewCamera } from './PursuitViewCamera';
+import { ModelEntity } from './ModelEntity';
 
 // Overall logic for the ground track producer.
 // A driver's view camera is updated with the current position and builds a view of the road ahead.
@@ -21,7 +22,7 @@ import { PursuitViewCamera } from './PursuitViewCamera';
 // In this project, we're using a token stored in a separate file that is not checked in.
 Cesium.Ion.defaultAccessToken = ACCESS_TOKEN;
 
-const FPS = 5;
+const FPS = 10;
 const overheadAltitude = 5000;
 const pursuitAltitude = 1000;
 
@@ -63,7 +64,7 @@ const pursuitViewer = new Cesium.Viewer('pursuitViewContainer', {
   targetFrameRate: 10,
 });
 
-// Sanner Road, Columbia, MD
+// Maple Lawn, MD
 let currentLongitude = -76.90074;
 let currentLatitude = 39.165914;
 
@@ -114,11 +115,9 @@ const vehicle = new VelocityOrientedBillboard(
   roadFollowingPathCalculator.getPosition(),
 );
 
-const vehicle2 = new VelocityOrientedBillboard(
+const milkTruck = new ModelEntity(
   pursuitViewer,
-  roadFollowingPathCalculator.getPosition(),
-  50,
-  50,
+  'assets/CesiumMilkTruck-kmc.glb',
 );
 
 const aircraft = new VelocityOrientedBillboard(
@@ -132,12 +131,13 @@ const aircraft = new VelocityOrientedBillboard(
 let tick = 0;
 setInterval(() => {
   roadFollowingPathCalculator.update();
-  const position = roadFollowingPathCalculator.getPosition();
+  const floatingPosition = roadFollowingPathCalculator.getPosition();
+  const position = raiseCartesian(floatingPosition, 0);
 
   airPursuitPathCalculator.update(position);
-  driversViewCamera.update(position);
+  driversViewCamera.update(floatingPosition);
   vehicle.update(position);
-  vehicle2.update(position);
+  milkTruck.update(position);
   aircraft.update(airPursuitPathCalculator.getPosition());
 
   pursuitViewCamera.update(airPursuitPathCalculator.getPosition(), position);

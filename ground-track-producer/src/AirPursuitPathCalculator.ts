@@ -21,7 +21,6 @@ export class AirPursuitPathCalculator {
   goalDistance: number;
 
   normalMode: boolean;
-  distanceDiv: HTMLDivElement;
   lastUpdateTime: number;
 
   constructor(
@@ -36,10 +35,6 @@ export class AirPursuitPathCalculator {
     this.goalDistance = goalDistance;
 
     this.normalMode = false;
-
-    this.distanceDiv = document.createElement('div');
-    document.body.appendChild(this.distanceDiv);
-
     this.lastUpdateTime = Date.now();
   }
 
@@ -70,7 +65,6 @@ export class AirPursuitPathCalculator {
     );
     Cesium.Cartesian3.add(this.currentPosition, progress, this.currentPosition);
 
-    this.distanceDiv.innerText = 'Distance: ' + distance.toFixed(2) + ' meters';
     this.lastUpdateTime = Date.now();
   }
 }

@@ -1,11 +1,7 @@
 import * as Cesium from 'cesium';
-import {
-  raiseCartesian,
-  terrainCartesianFromScreen,
-  toCartographic,
-} from './cesium-helpers';
+import { raiseCartesian, terrainCartesianFromScreen } from './cesium-helpers';
 import { Cartesian2 } from 'cesium';
-import { calculateSpeedInMPH, clamp } from './calculations';
+import { clamp } from './calculations';
 
 // A road following path calculator uses the view of the road ahead to calculate the next position.
 // It copies the pixels from the cesium canvas to a 2D canvas and then scans the 2D canvas for the road.
@@ -21,9 +17,6 @@ export class RoadFollowingPathCalculator {
   currentPosition: Cesium.Cartesian3;
   viewer: Cesium.Viewer;
   ctx2D: CanvasRenderingContext2D;
-  latitudeDiv: HTMLDivElement;
-  longitudeDiv: HTMLDivElement;
-  speedDiv: HTMLDivElement;
   steeringGoal: number;
   readyToMove: boolean;
   lastUpdateTime: number;
@@ -59,13 +52,6 @@ export class RoadFollowingPathCalculator {
     canvas2D.height = sampleHeight;
     this.ctx2D = canvas2D.getContext('2d', { willReadFrequently: true });
     document.body.appendChild(canvas2D);
-
-    this.latitudeDiv = document.createElement('div');
-    this.longitudeDiv = document.createElement('div');
-    this.speedDiv = document.createElement('div');
-    document.body.appendChild(this.latitudeDiv);
-    document.body.appendChild(this.longitudeDiv);
-    document.body.appendChild(this.speedDiv);
   }
 
   getPosition() {
@@ -136,33 +122,11 @@ export class RoadFollowingPathCalculator {
       );
 
       if (newGroundPosition) {
-        const previousPosition = this.currentPosition;
-
         this.currentPosition = raiseCartesian(newGroundPosition, this.altitude);
-        const cartographic = toCartographic(this.currentPosition);
-        this.latitudeDiv.innerText =
-          'Vehicle Latitude: ' +
-          Cesium.Math.toDegrees(cartographic.latitude).toFixed(6) +
-          ' ';
-        this.longitudeDiv.innerText =
-          'Vehicle Longitude: ' +
-          Cesium.Math.toDegrees(cartographic.longitude).toFixed(6) +
-          ' ';
-        this.speedDiv.innerText =
-          'Vehicle Speed: ' +
-          calculateSpeedInMPH(
-            previousPosition,
-            this.currentPosition,
-            Date.now() - this.lastUpdateTime,
-          ).toFixed(2) +
-          ' mph';
-
         this.lastUpdateTime = Date.now();
       }
     }
   }
-
-  getSpeed() {}
 }
 
 // Utility functions for finding the road in a map image

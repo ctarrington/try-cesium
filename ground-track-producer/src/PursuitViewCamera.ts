@@ -10,16 +10,15 @@ export class PursuitViewCamera {
     this.viewer = viewer;
 
     const aspectRatio = viewer.canvas.clientWidth / viewer.canvas.clientHeight;
-    const frustrum = new Cesium.PerspectiveFrustum({
-      fov: Cesium.Math.PI / 35,
+    this.viewer.camera.frustum = new Cesium.PerspectiveFrustum({
+      fov: Cesium.Math.PI / 100,
       aspectRatio,
     });
-    this.viewer.camera.frustum = frustrum;
   }
 
   update(cameraPosition: Cesium.Cartesian3, targetPosition: Cesium.Cartesian3) {
     const camera = this.viewer.camera;
-    var direction = Cesium.Cartesian3.subtract(
+    let direction = Cesium.Cartesian3.subtract(
       targetPosition,
       cameraPosition,
       new Cesium.Cartesian3(),
@@ -28,13 +27,13 @@ export class PursuitViewCamera {
     camera.direction = direction;
 
     // get an "approximate" up vector, which in this case we want to be something like the geodetic surface normal.
-    var approxUp = Cesium.Cartesian3.normalize(
+    let approxUp = Cesium.Cartesian3.normalize(
       cameraPosition,
       new Cesium.Cartesian3(),
     );
 
-    // cross viewdir with approxUp to get a right normal
-    var right = Cesium.Cartesian3.cross(
+    // cross direction with approxUp to get a right normal
+    let right = Cesium.Cartesian3.cross(
       direction,
       approxUp,
       new Cesium.Cartesian3(),
@@ -43,7 +42,7 @@ export class PursuitViewCamera {
     camera.right = right;
 
     // cross right with view dir to get an orthonormal up
-    var up = Cesium.Cartesian3.cross(right, direction, new Cesium.Cartesian3());
+    let up = Cesium.Cartesian3.cross(right, direction, new Cesium.Cartesian3());
     up = Cesium.Cartesian3.normalize(up, up);
     camera.up = up;
     camera.position = cameraPosition;
