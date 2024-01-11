@@ -13,7 +13,6 @@ const sampleHeight = 120;
 const maxOffset = 5;
 
 export class RoadFollowingPathCalculator {
-  altitude: number;
   currentPosition: Cesium.Cartesian3;
   viewer: Cesium.Viewer;
   ctx2D: CanvasRenderingContext2D;
@@ -25,10 +24,8 @@ export class RoadFollowingPathCalculator {
     viewer: Cesium.Viewer,
     initialLongitude: number,
     initialLatitude: number,
-    altitude: number,
   ) {
     this.viewer = viewer;
-    this.altitude = altitude;
     this.steeringGoal = this.viewer.scene.canvas.width / 2;
     this.readyToMove = false;
     this.lastUpdateTime = Date.now();
@@ -36,7 +33,7 @@ export class RoadFollowingPathCalculator {
     this.currentPosition = Cesium.Cartesian3.fromDegrees(
       initialLongitude,
       initialLatitude,
-      altitude,
+      0,
     );
 
     // Create a 2D canvas to sample the road ahead. Position it over the cesium canvas.
@@ -122,7 +119,7 @@ export class RoadFollowingPathCalculator {
       );
 
       if (newGroundPosition) {
-        this.currentPosition = raiseCartesian(newGroundPosition, this.altitude);
+        this.currentPosition = newGroundPosition;
         this.lastUpdateTime = Date.now();
       }
     }

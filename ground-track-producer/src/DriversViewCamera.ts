@@ -1,5 +1,5 @@
 import * as Cesium from 'cesium';
-import { toCartographic } from './cesium-helpers';
+import { raiseCartesian, toCartographic } from './cesium-helpers';
 import { calculateBearing } from './calculations';
 
 // A driver's view camera is a Cesium camera that looks at the road ahead based on the current and previous positions.
@@ -30,9 +30,11 @@ export class DriversViewCamera {
     this.heading = initialHeading;
   }
 
-  update(destination: Cesium.Cartesian3) {
+  update(position: Cesium.Cartesian3) {
     this.previousPosition = this.position;
-    this.position = destination;
+    this.position = position;
+
+    const destination = raiseCartesian(this.position, 50);
 
     this.heading = calculateBearing(
       toCartographic(this.previousPosition),

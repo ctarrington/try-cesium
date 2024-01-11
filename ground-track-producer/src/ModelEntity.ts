@@ -57,19 +57,19 @@ export class ModelEntity {
     );
     const secondCartographic = Cesium.Cartographic.fromCartesian(this.position);
 
-    var deltaLon = secondCartographic.longitude - firstCartographic.longitude;
-    var deltaLat = secondCartographic.latitude - firstCartographic.latitude;
-    var deltaHeight = secondCartographic.height - firstCartographic.height;
-    var distance = Cesium.Cartesian3.distance(
+    const deltaLon = secondCartographic.longitude - firstCartographic.longitude;
+    const deltaLat = secondCartographic.latitude - firstCartographic.latitude;
+    const deltaHeight = secondCartographic.height - firstCartographic.height;
+    const distance = Cesium.Cartesian3.distance(
       this.previousPosition,
       this.position,
     );
 
-    var heading = -Math.atan2(deltaLat, deltaLon) + Math.PI / 2.0;
-    var pitch = Math.atan2(deltaHeight, distance);
-    var roll = 0;
+    const heading = -Math.atan2(deltaLat, deltaLon) + Math.PI / 2.0;
+    const pitch = Math.atan2(deltaHeight, distance);
+    const roll = 0;
 
-    var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
+    const hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
     this.orientation = Cesium.Transforms.headingPitchRollQuaternion(
       this.position,
       hpr,

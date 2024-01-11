@@ -72,7 +72,6 @@ const roadFollowingPathCalculator = new RoadFollowingPathCalculator(
   driversViewer,
   currentLongitude,
   currentLatitude,
-  50,
 );
 
 const initialAirPursuitPosition = Cesium.Cartesian3.fromDegrees(
@@ -118,6 +117,9 @@ const vehicle = new VelocityOrientedBillboard(
 const vehicle2 = new VelocityOrientedBillboard(
   driversViewer,
   roadFollowingPathCalculator.getPosition(),
+  50,
+  50,
+  Cesium.Color.RED,
 );
 
 const milkTruck = new ModelEntity(
