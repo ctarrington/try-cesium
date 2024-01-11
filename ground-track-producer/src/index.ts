@@ -22,7 +22,7 @@ import { ModelEntity } from './ModelEntity';
 // In this project, we're using a token stored in a separate file that is not checked in.
 Cesium.Ion.defaultAccessToken = ACCESS_TOKEN;
 
-const FPS = 10;
+const FPS = 5;
 const overheadAltitude = 5000;
 const pursuitAltitude = 1000;
 
@@ -115,6 +115,11 @@ const vehicle = new VelocityOrientedBillboard(
   roadFollowingPathCalculator.getPosition(),
 );
 
+const vehicle2 = new VelocityOrientedBillboard(
+  driversViewer,
+  roadFollowingPathCalculator.getPosition(),
+);
+
 const milkTruck = new ModelEntity(
   pursuitViewer,
   'assets/CesiumMilkTruck-kmc.glb',
@@ -137,6 +142,7 @@ setInterval(() => {
   airPursuitPathCalculator.update(position);
   driversViewCamera.update(floatingPosition);
   vehicle.update(position);
+  vehicle2.update(position);
   milkTruck.update(position);
   aircraft.update(airPursuitPathCalculator.getPosition());
 
@@ -165,8 +171,8 @@ setInterval(() => {
   }
 }, 1000 / FPS);
 
-// todo: add a pursuit view, camera and path calculator
-// todo: add entity for car
+// todo: add a sensor overlay view
+// todo: add a drape view
 
 // todo: add more states: waiting, moving, lost
 // todo: figure out speed

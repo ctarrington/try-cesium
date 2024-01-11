@@ -8,9 +8,9 @@ import { clamp } from './calculations';
 
 // The following parameters were determined by trial and error.
 // They are in pixels
-const lookAheadDistance = 250;
+const lookAheadDistance = 300;
 const sampleHeight = 120;
-const maxOffset = 4;
+const maxOffset = 5;
 
 export class RoadFollowingPathCalculator {
   altitude: number;
@@ -107,7 +107,7 @@ export class RoadFollowingPathCalculator {
               this.ctx2D.fillRect(rightIndex, rowIndex, 1, 1);
             }
           }
-          this.steeringGoal = steeringGoal;
+          this.steeringGoal = steeringGoal - 7;
         }, 0);
       },
     );
