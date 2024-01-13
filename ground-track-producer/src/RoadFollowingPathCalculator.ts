@@ -8,7 +8,7 @@ import { clamp } from './calculations';
 
 // The following parameters were determined by trial and error.
 // They are in pixels
-const lookAheadDistance = 300;
+const lookAheadDistance = 290;
 const sampleHeight = 120;
 const maxOffset = 5;
 

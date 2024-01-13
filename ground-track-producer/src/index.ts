@@ -68,6 +68,10 @@ const pursuitViewer = new Cesium.Viewer('pursuitViewContainer', {
 let currentLongitude = -76.90074;
 let currentLatitude = 39.165914;
 
+// Liberty Township, Missouri
+//let currentLongitude = -92.410859;
+//let currentLatitude = 37.783029;
+
 const roadFollowingPathCalculator = new RoadFollowingPathCalculator(
   driversViewer,
   currentLongitude,
@@ -75,8 +79,8 @@ const roadFollowingPathCalculator = new RoadFollowingPathCalculator(
 );
 
 const initialAirPursuitPosition = Cesium.Cartesian3.fromDegrees(
-  -76.9,
-  39.15,
+  currentLongitude + 0.01,
+  currentLatitude + 0.001,
   pursuitAltitude,
 );
 const airPursuitPathCalculator = new AirPursuitPathCalculator(
