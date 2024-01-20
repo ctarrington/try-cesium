@@ -1,5 +1,5 @@
 import * as Cesium from 'cesium';
-import { raiseCartesian, terrainCartesianFromScreen } from './cesium-helpers';
+import { terrainCartesianFromScreen } from './cesium-helpers';
 import { Cartesian2 } from 'cesium';
 import { clamp } from './calculations';
 
@@ -8,7 +8,7 @@ import { clamp } from './calculations';
 
 // The following parameters were determined by trial and error.
 // They are in pixels
-const lookAheadDistance = 290;
+const lookAheadDistance = 270;
 const sampleHeight = 120;
 const maxOffset = 5;
 
@@ -38,7 +38,7 @@ export class RoadFollowingPathCalculator {
 
     // Create a 2D canvas to sample the road ahead. Position it over the cesium canvas.
     const top =
-      this.viewer.scene.canvas.height - lookAheadDistance - sampleHeight / 2;
+      this.viewer.scene.canvas.height - lookAheadDistance - sampleHeight;
     const canvas2D = document.createElement('canvas');
     canvas2D.style.position = 'absolute';
     canvas2D.style.top = '' + top + 'px';
@@ -65,7 +65,7 @@ export class RoadFollowingPathCalculator {
     const height = canvas.height;
 
     const centerX = width / 2;
-    const sampleY = height - lookAheadDistance - sampleHeight / 2;
+    const sampleY = height - lookAheadDistance - sampleHeight;
 
     const removePostRender = this.viewer.scene.postRender.addEventListener(
       () => {
@@ -90,39 +90,41 @@ export class RoadFollowingPathCalculator {
 
           const data = this.ctx2D.getImageData(0, 0, width, sampleHeight).data;
 
-          let steeringGoal = this.steeringGoal;
           this.readyToMove = false;
 
           // Scan the 2D canvas from bottom to top, looking for the edges of the road.
           // Take the last edge found, which is the edge of the road furthest away from the current position.
+          let sumOfRightIndices = 0;
+          let countOfRightIndices = 0;
           for (let rowIndex = sampleHeight - 1; rowIndex >= 0; rowIndex--) {
             const { leftIndex, rightIndex } = findRoad(data, width, rowIndex);
             if (rightIndex && leftIndex) {
-              steeringGoal = rightIndex;
-              this.readyToMove = true;
               this.ctx2D.fillRect(leftIndex, rowIndex, 1, 1);
               this.ctx2D.fillRect(rightIndex, rowIndex, 1, 1);
+              sumOfRightIndices += rightIndex;
+              countOfRightIndices++;
             }
           }
-          this.steeringGoal = steeringGoal - 7;
+
+          if (countOfRightIndices > 0) {
+            const averageRightIndex = sumOfRightIndices / countOfRightIndices;
+            const newGroundPosition = terrainCartesianFromScreen(
+              this.viewer,
+              new Cartesian2(
+                averageRightIndex - 4,
+                sampleY + 0.75 * sampleHeight,
+              ),
+            );
+
+            if (newGroundPosition) {
+              this.currentPosition = newGroundPosition;
+              this.readyToMove = true;
+              this.lastUpdateTime = Date.now();
+            }
+          }
         }, 0);
       },
     );
-
-    // Calculate the offset from the center of the road.
-    let offset = clamp(-maxOffset, maxOffset, this.steeringGoal - centerX);
-
-    if (this.readyToMove) {
-      const newGroundPosition = terrainCartesianFromScreen(
-        this.viewer,
-        new Cartesian2(centerX + offset, height - lookAheadDistance),
-      );
-
-      if (newGroundPosition) {
-        this.currentPosition = newGroundPosition;
-        this.lastUpdateTime = Date.now();
-      }
-    }
   }
 }
 
