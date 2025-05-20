@@ -1,10 +1,16 @@
 import './App.css';
-import CesiumViewer from './CesiumViewer.tsx';
+
+import { useRef } from 'react';
+
+import { useCreateViewer } from './useCreateViewer.ts';
 
 function App() {
+  const viewerRef = useRef<HTMLDivElement>(null);
+  useCreateViewer(viewerRef);
+
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
-      <CesiumViewer />
+      <div ref={viewerRef} style={{ width: '100%', height: '100%' }} />
     </div>
   );
 }
