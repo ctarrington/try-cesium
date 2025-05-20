@@ -24,10 +24,14 @@ npm run dev
 - [x] factor out the view creation to a useEffect
 ------------------------------
 - [x] strip out the cesium boilderplate
-- [ ] make a pane for the tree table
-- [ ] show the reference points in a tree table
+- [x] make a pane for the tree table
+- [x] show the reference points in a tree table
+- [ ] add buttons for a new folder or ref point
 - [ ] show a modal dialog for the selected reference point
 - [ ] make the tree table collapsible
+- [ ] experiment with opacity and on mouse in and out
+- [ ] New buttons on the bottom when full size?
+- [ ] collapsed shows just buttons on the left
 ------------------------------
 - [ ] use effect for the current cursor with lat, lon, screen x, y
 - [ ] have a default new ref point 

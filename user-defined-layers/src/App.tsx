@@ -6,6 +6,7 @@ import { useCreateViewer } from './useCreateViewer.ts';
 import { useMousePosition } from './useMousePosition.ts';
 import type { Child } from './model.ts';
 import MarkupTable from './MarkupTable.tsx';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 const defaultRowData: Child[] = [
   {
@@ -22,6 +23,21 @@ const defaultRowData: Child[] = [
     parentId: '1',
     type: 'referencePoint',
     description: 'a small blue thing',
+  },
+  {
+    id: '3',
+    name: 'Red Things',
+    type: 'folder',
+    description: 'Red things are cool',
+  },
+  {
+    id: '4',
+    name: 'red 4',
+    latitude: 0,
+    longitude: 0,
+    parentId: '3',
+    type: 'referencePoint',
+    description: 'a small red thing',
   },
 ];
 
@@ -95,12 +111,21 @@ function App() {
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
-      <MarkupTable
-        rowData={rowData}
-        newRowData={newRowData}
-        upsertRow={upsertRow}
-      />
-      <div id={containerId.current} style={{ width: '100%', height: '100%' }} />
+      <div>
+        <PanelGroup direction="horizontal">
+          <Panel collapsible={true} collapsedSize={5} minSize={10} maxSize={50}>
+            <MarkupTable
+              rowData={rowData}
+              newRowData={newRowData}
+              upsertRow={upsertRow}
+            />
+          </Panel>
+          <PanelResizeHandle />
+          <Panel>
+            <div id={containerId.current} style={{ height: '100vh' }} />
+          </Panel>
+        </PanelGroup>
+      </div>
     </div>
   );
 }

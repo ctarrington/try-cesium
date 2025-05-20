@@ -129,7 +129,11 @@ function MarkupTable({ rowData, newRowData, upsertRow }: CarTableProps) {
   return (
     <>
       <div>
-        <div style={{ height: 400 }}>
+        <div
+          style={{
+            height: '100vh',
+          }}
+        >
           <AgGridReact
             treeData={true}
             rowData={rowData}
