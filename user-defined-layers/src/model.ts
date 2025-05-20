@@ -12,7 +12,7 @@ export type ReferencePoint = {
   latitude: number;
   longitude: number;
   parentId?: string;
-  type: string;
+  type: 'referencePoint';
   description: string;
 };
 

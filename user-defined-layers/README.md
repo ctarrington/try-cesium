@@ -22,26 +22,22 @@ npm run dev
 ## Todo
 - [x] have state at the top level for reference points
 - [x] factor out the view creation to a useEffect
-------------------------------
 - [x] strip out the cesium boilderplate
 - [x] make a pane for the tree table
 - [x] show the reference points in a tree table
 - [x] add buttons for a new folder or ref point
 - [x] collapsed shows just buttons on the left
 ------------------------------
-- [ ] show a modal dialog for the selected reference point
-- [ ] make the tree table collapsible
-- [ ] experiment with opacity and on mouse in and out
-- [ ] New buttons on the bottom when full size?
-- [ ] use effect for the current cursor with lat, lon, screen x, y
-- [ ] have a default new ref point 
+- [ ] show a modal dialog for the new ref point
+- [ ] show a modal dialog from an action on the row
+- [ ] edit position on demand
 - [ ] show the reference points on the map 
-- [ ] make an active reference point be draggable
-- [ ] use the static menu buttons to create a ref point and add to state
-- [ ] show an editor when there is a new ref point active
-- [ ] turn off all the optional stuff in cesium
+------------------------------
+- [ ] make an editing reference point be draggable
+- [ ] use icons in the table
+- [ ] use icons in the buttons
 - [ ] DRY out the models
+- [ ] experiment with opacity and on mouse in and out
 - [ ] Add a second model type - circle
-- [ ] 
 - [ ] 
 - [ ] 

@@ -7,6 +7,7 @@ import { useMousePosition } from './useMousePosition.ts';
 import type { Child } from './model.ts';
 import MarkupTable from './MarkupTable.tsx';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { ModalEditor } from './ModalEditor.tsx';
 
 const defaultRowData: Child[] = [
   {
@@ -73,6 +74,7 @@ function App() {
   const [rowData, setRowData] = useState<Child[]>(defaultRowData);
   const [newRowData, setNewRowData] = useState<Child[]>([]);
   const [collapsed, setCollapsed] = useState(false);
+  const [editId, setEditId] = useState<string | undefined>(undefined);
 
   // edit or create
   const upsertRow = useCallback(
@@ -103,10 +105,15 @@ function App() {
       } else {
         // new row
         setNewRowData([...newRowData, newRow]);
+        setEditId(newRow.id);
       }
     },
     [rowData, newRowData],
   );
+
+  const onCloseModal = useCallback(() => {
+    setEditId(undefined);
+  }, [setEditId]);
 
   const onResize = useCallback((value: number) => {
     if (value < 6) {
@@ -117,6 +124,8 @@ function App() {
   }, []);
 
   console.log('Mouse Position:', mousePosition);
+  console.log('newRowData:', newRowData);
+  console.log('rowData:', rowData);
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
@@ -142,6 +151,13 @@ function App() {
           </Panel>
         </PanelGroup>
       </div>
+      <ModalEditor
+        rowData={rowData}
+        newRowData={newRowData}
+        upsertRow={upsertRow}
+        editId={editId}
+        onClose={onCloseModal}
+      />
     </div>
   );
 }
