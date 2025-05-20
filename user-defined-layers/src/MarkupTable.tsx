@@ -108,6 +108,28 @@ function MarkupTable({ rowData, newRowData, upsertRow }: CarTableProps) {
     [rowData, upsertRow],
   );
 
+  const createFolder = useCallback(() => {
+    const newRow = {
+      id: `${Math.random()}`,
+      name: 'Name...',
+      type: 'folder',
+      description: 'Description...',
+    };
+    upsertRow(newRow);
+  }, [upsertRow]);
+
+  const createReferencePoint = useCallback(() => {
+    const newRow = {
+      id: `${Math.random()}`,
+      name: 'Name...',
+      type: 'referencePoint',
+      description: 'Description...',
+      latitude: 0,
+      longitude: 0,
+    };
+    upsertRow(newRow);
+  }, [upsertRow]);
+
   // Column Definitions: Defines the columns to be displayed.
   const colDefs: ColDef[] = [
     {
@@ -134,6 +156,14 @@ function MarkupTable({ rowData, newRowData, upsertRow }: CarTableProps) {
             height: '100vh',
           }}
         >
+          <div>
+            <button type="button" onClick={createFolder}>
+              + Folder
+            </button>
+            <button type="button" onClick={createReferencePoint}>
+              + Point
+            </button>
+          </div>
           <AgGridReact
             treeData={true}
             rowData={rowData}
@@ -149,7 +179,7 @@ function MarkupTable({ rowData, newRowData, upsertRow }: CarTableProps) {
             getRowId={(params) => params.data.id}
             treeDataParentIdField="parentId"
             onRowDragEnd={onRowDragEnd}
-            pinnedBottomRowData={newRowData}
+            pinnedTopRowData={newRowData}
             getRowStyle={getRowStyle}
             enableAdvancedFilter={true}
           />
