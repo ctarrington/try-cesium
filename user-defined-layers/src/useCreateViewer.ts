@@ -1,4 +1,4 @@
-import { type RefObject, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Viewer } from 'cesium';
 
@@ -9,14 +9,14 @@ import { ACCESS_TOKEN } from './dontcheckin';
 // In this project, we're using a token stored in a separate file that is not checked in.
 Cesium.Ion.defaultAccessToken = ACCESS_TOKEN;
 
-export const useCreateViewer = (
-  viewerRef: RefObject<HTMLDivElement | null>,
-) => {
+export const useCreateViewer = (containerId: string) => {
   const [viewer, setViewer] = useState<Viewer | null>(null);
 
   useEffect(() => {
-    if (viewerRef && viewerRef.current && !viewer) {
-      setViewer(new Viewer(viewerRef.current));
+    if (!viewer) {
+      createViewer(containerId).then((viewer: Viewer) => {
+        setViewer(viewer);
+      });
     }
 
     return () => {
@@ -24,7 +24,15 @@ export const useCreateViewer = (
         viewer.destroy();
       }
     };
-  }, [viewerRef, viewer]);
+  }, [containerId, viewer]);
 
   return viewer;
+};
+
+const createViewer = async (containerId: string): Promise<Viewer> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(new Viewer(containerId));
+    }, 1000);
+  });
 };
