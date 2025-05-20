@@ -27,13 +27,12 @@ npm run dev
 - [x] show the reference points in a tree table
 - [x] add buttons for a new folder or ref point
 - [x] collapsed shows just buttons on the left
+- [x] show a modal dialog for the new ref point
+- [x] show a modal dialog from an action on the row
 ------------------------------
-- [ ] show a modal dialog for the new ref point
-- [ ] show a modal dialog from an action on the row
-- [ ] edit position on demand
 - [ ] show the reference points on the map 
+- [ ] make a reference point be draggable during edit
 ------------------------------
-- [ ] make an editing reference point be draggable
 - [ ] use icons in the table
 - [ ] use icons in the buttons
 - [ ] DRY out the models

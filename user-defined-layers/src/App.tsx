@@ -115,6 +115,13 @@ function App() {
     setEditId(undefined);
   }, [setEditId]);
 
+  const onOpenModal = useCallback(
+    (id: string) => {
+      setEditId(id);
+    },
+    [setEditId],
+  );
+
   const onResize = useCallback((value: number) => {
     if (value < 6) {
       setCollapsed(true);
@@ -143,6 +150,7 @@ function App() {
               newRowData={newRowData}
               upsertRow={upsertRow}
               collapsed={collapsed}
+              onOpenModal={onOpenModal}
             />
           </Panel>
           <PanelResizeHandle />

@@ -38,6 +38,7 @@ interface CarTableProps {
   newRowData: Child[];
   upsertRow: (row: Child) => void;
   collapsed: boolean;
+  onOpenModal: (id: string | undefined) => void;
 }
 
 function getAncestors(rowData: Child[], id: string): string[] {
@@ -72,6 +73,7 @@ function MarkupTable({
   newRowData,
   upsertRow,
   collapsed,
+  onOpenModal,
 }: CarTableProps) {
   // see https://www.ag-grid.com/react-data-grid/value-setters/
   const childValueSetter: ValueSetterFunc<Child> = useCallback(
@@ -119,6 +121,22 @@ function MarkupTable({
   );
 
   // Column Definitions: Defines the columns to be displayed.
+  const actionsRenderer = useCallback(
+    (params: IRowNode<Child>) => {
+      console.log('actionsRenderer', params);
+      if (params.data?.type !== 'referencePoint') {
+        return null;
+      }
+
+      return (
+        <button type="button" onClick={() => onOpenModal(params.data?.id)}>
+          hi
+        </button>
+      );
+    },
+    [onOpenModal],
+  );
+
   const colDefs: ColDef[] = [
     {
       field: 'name',
@@ -133,6 +151,10 @@ function MarkupTable({
       valueSetter: childValueSetter,
       cellEditor: 'agLargeTextCellEditor',
       cellEditorPopup: true,
+    },
+    {
+      field: 'actions',
+      cellRenderer: actionsRenderer,
     },
   ];
 
