@@ -1,17 +1,19 @@
-export interface Markup {
-  name: string;
-  description: string;
+export type Folder = {
   id: string;
-}
+  name: string;
+  parentId?: string;
+  type: string;
+  description: string;
+};
 
-export interface ReferencePoint extends Markup {
-  longitude: number;
+export type ReferencePoint = {
+  id: string;
+  name: string;
   latitude: number;
-  type: 'referencePoint';
-}
+  longitude: number;
+  parentId?: string;
+  type: string;
+  description: string;
+};
 
-export interface Folder extends Markup {
-  type: 'folder';
-}
-
-export type MarkupNode = ReferencePoint | Folder;
+export type Child = Folder | ReferencePoint;
