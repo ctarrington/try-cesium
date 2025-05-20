@@ -17,8 +17,11 @@ import {
 } from 'ag-grid-community';
 
 import { AdvancedFilterModule, TreeDataModule } from 'ag-grid-enterprise';
+
 import { useCallback } from 'react';
+
 import type { Child } from './model.ts';
+import { AddMarkupButtonBar } from './AddMarkupButtonBar.tsx';
 
 // Register all Community features
 ModuleRegistry.registerModules([
@@ -31,9 +34,10 @@ ModuleRegistry.registerModules([
 // see https://www.ag-grid.com/javascript-data-grid/tree-data-self-referential/
 
 interface CarTableProps {
-  rowData: Child[]; // existing row data
-  newRowData: Child[]; // new rows that need to be finished
+  rowData: Child[];
+  newRowData: Child[];
   upsertRow: (row: Child) => void;
+  collapsed: boolean;
 }
 
 function getAncestors(rowData: Child[], id: string): string[] {
@@ -54,6 +58,7 @@ function calculateNewParentId(overNode: IRowNode | undefined) {
 
   return isFolder(overNode) ? overNode.data.id : overNode.data.parentId;
 }
+
 const isFolder = (params: IRowNode<Child>) => {
   return params?.data?.type === 'folder';
 };
@@ -62,7 +67,12 @@ const getRowStyle = (params: RowClassParams) => {
   return params.node.rowPinned ? { fontWeight: 'bold' } : undefined;
 };
 
-function MarkupTable({ rowData, newRowData, upsertRow }: CarTableProps) {
+function MarkupTable({
+  rowData,
+  newRowData,
+  upsertRow,
+  collapsed,
+}: CarTableProps) {
   // see https://www.ag-grid.com/react-data-grid/value-setters/
   const childValueSetter: ValueSetterFunc<Child> = useCallback(
     (params: ValueSetterParams<Child>) => {
@@ -108,28 +118,6 @@ function MarkupTable({ rowData, newRowData, upsertRow }: CarTableProps) {
     [rowData, upsertRow],
   );
 
-  const createFolder = useCallback(() => {
-    const newRow = {
-      id: `${Math.random()}`,
-      name: 'Name...',
-      type: 'folder',
-      description: 'Description...',
-    };
-    upsertRow(newRow);
-  }, [upsertRow]);
-
-  const createReferencePoint = useCallback(() => {
-    const newRow = {
-      id: `${Math.random()}`,
-      name: 'Name...',
-      type: 'referencePoint',
-      description: 'Description...',
-      latitude: 0,
-      longitude: 0,
-    };
-    upsertRow(newRow);
-  }, [upsertRow]);
-
   // Column Definitions: Defines the columns to be displayed.
   const colDefs: ColDef[] = [
     {
@@ -148,6 +136,28 @@ function MarkupTable({ rowData, newRowData, upsertRow }: CarTableProps) {
     },
   ];
 
+  const grid = collapsed ? undefined : (
+    <AgGridReact
+      treeData={true}
+      rowData={rowData}
+      columnDefs={colDefs}
+      groupDefaultExpanded={-1}
+      autoGroupColumnDef={{
+        rowDrag: true,
+        headerName: '',
+        editable: false,
+        cellRendererParams: { suppressCount: true },
+        valueGetter: groupValueGetter,
+      }}
+      getRowId={(params) => params.data.id}
+      treeDataParentIdField="parentId"
+      onRowDragEnd={onRowDragEnd}
+      pinnedTopRowData={newRowData}
+      getRowStyle={getRowStyle}
+      enableAdvancedFilter={true}
+    />
+  );
+
   return (
     <>
       <div>
@@ -156,33 +166,8 @@ function MarkupTable({ rowData, newRowData, upsertRow }: CarTableProps) {
             height: '100vh',
           }}
         >
-          <div>
-            <button type="button" onClick={createFolder}>
-              + Folder
-            </button>
-            <button type="button" onClick={createReferencePoint}>
-              + Point
-            </button>
-          </div>
-          <AgGridReact
-            treeData={true}
-            rowData={rowData}
-            columnDefs={colDefs}
-            groupDefaultExpanded={-1}
-            autoGroupColumnDef={{
-              rowDrag: true,
-              headerName: '',
-              editable: false,
-              cellRendererParams: { suppressCount: true },
-              valueGetter: groupValueGetter,
-            }}
-            getRowId={(params) => params.data.id}
-            treeDataParentIdField="parentId"
-            onRowDragEnd={onRowDragEnd}
-            pinnedTopRowData={newRowData}
-            getRowStyle={getRowStyle}
-            enableAdvancedFilter={true}
-          />
+          <AddMarkupButtonBar upsertRow={upsertRow} />
+          {grid}
         </div>
       </div>
     </>

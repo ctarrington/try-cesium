@@ -27,7 +27,7 @@ npm run dev
 - [x] make a pane for the tree table
 - [x] show the reference points in a tree table
 - [x] add buttons for a new folder or ref point
-- [ ] collapsed shows just buttons on the left
+- [x] collapsed shows just buttons on the left
 ------------------------------
 - [ ] show a modal dialog for the selected reference point
 - [ ] make the tree table collapsible

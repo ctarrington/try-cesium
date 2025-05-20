@@ -72,6 +72,7 @@ function App() {
   const mousePosition = useMousePosition(viewer);
   const [rowData, setRowData] = useState<Child[]>(defaultRowData);
   const [newRowData, setNewRowData] = useState<Child[]>([]);
+  const [collapsed, setCollapsed] = useState(false);
 
   // edit or create
   const upsertRow = useCallback(
@@ -107,17 +108,32 @@ function App() {
     [rowData, newRowData],
   );
 
+  const onResize = useCallback((value: number) => {
+    if (value < 6) {
+      setCollapsed(true);
+    } else {
+      setCollapsed(false);
+    }
+  }, []);
+
   console.log('Mouse Position:', mousePosition);
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <div>
         <PanelGroup direction="horizontal">
-          <Panel collapsible={true} collapsedSize={5} minSize={10} maxSize={50}>
+          <Panel
+            collapsible={true}
+            collapsedSize={5}
+            minSize={5}
+            maxSize={50}
+            onResize={onResize}
+          >
             <MarkupTable
               rowData={rowData}
               newRowData={newRowData}
               upsertRow={upsertRow}
+              collapsed={collapsed}
             />
           </Panel>
           <PanelResizeHandle />
