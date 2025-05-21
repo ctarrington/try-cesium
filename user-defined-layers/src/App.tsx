@@ -2,13 +2,32 @@ import './App.css';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { useCreateViewer } from './useCreateViewer.ts';
 import { useMousePosition } from './useMousePosition.ts';
 import type { Child, ReferencePoint } from './model.ts';
 import MarkupTable from './MarkupTable.tsx';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { ModalEditor } from './ModalEditor.tsx';
 import { useUpdateReferencePoints } from './useUpdateReferencePoints.ts';
+
+import { Viewer } from 'cesium';
+import * as Cesium from 'cesium';
+import { ACCESS_TOKEN } from './dontcheckin';
+
+// Your access token can be found at: https://cesium.com/ion/tokens.
+// In this project, we're using a token stored in a separate file that is not checked in.
+Cesium.Ion.defaultAccessToken = ACCESS_TOKEN;
+
+const options = {
+  homeButton: false,
+  sceneModePicker: false,
+  selectionIndicator: false,
+  timeline: false,
+  navigationHelpButton: false,
+  animation: false,
+  infoBox: false,
+  geocoder: false,
+  scene3DOnly: true,
+};
 
 const defaultRowData: Child[] = [
   {
@@ -87,7 +106,7 @@ function validRow(row: Child) {
 
 function App() {
   const containerId = useRef<string>(createDivName());
-  const viewer = useCreateViewer(containerId.current);
+  const [viewer, setViewer] = useState<Viewer | null>(null);
   const mousePosition = useMousePosition(viewer);
   const [rowData, setRowData] = useState<Child[]>(
     getInitialData(LOCAL_ROW_DATA_KEY, defaultRowData),
@@ -102,6 +121,15 @@ function App() {
     (row) => row.type === 'referencePoint',
   ) as ReferencePoint[];
   useUpdateReferencePoints(referencePoints, viewer);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (!viewer) {
+        const newViewer = new Viewer(containerId.current, options);
+        setViewer(newViewer);
+      }
+    }, 100);
+  }, []);
 
   // edit or create
   const upsertRow = useCallback(
