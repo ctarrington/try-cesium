@@ -164,8 +164,22 @@ function App() {
       const newRow = rowData.find((row) => row.id === currentId);
       if (newRow) {
         const newRefPoint = { ...newRow } as ReferencePoint;
+        const oldRefPoint = { ...newRow } as ReferencePoint;
+
         newRefPoint.latitude = latitude ?? 0;
         newRefPoint.longitude = longitude ?? 0;
+
+        const deltaLatitude = Math.abs(
+          newRefPoint.latitude - oldRefPoint.latitude,
+        );
+        const deltaLongitude = Math.abs(
+          newRefPoint.longitude - oldRefPoint.longitude,
+        );
+
+        if (deltaLatitude < 0.0001 && deltaLongitude < 0.0001) {
+          return;
+        }
+
         upsertRow(newRefPoint as Child);
       }
     }
