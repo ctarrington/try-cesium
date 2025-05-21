@@ -13,35 +13,52 @@ import { useUpdateReferencePoints } from './useUpdateReferencePoints.ts';
 const defaultRowData: Child[] = [
   {
     id: '1',
-    name: 'Blue Things',
+    name: 'North America',
     type: 'folder',
-    description: 'Blue things are cool',
+    description: 'A few markers in North America',
   },
   {
     id: '2',
-    name: 'blue 2',
-    latitude: 0,
-    longitude: 0,
+    name: 'Miami',
+    latitude: 25.7617,
+    longitude: -80.1918,
     parentId: '1',
     type: 'referencePoint',
-    description: 'a small blue thing',
+    description: '',
   },
   {
     id: '3',
-    name: 'Red Things',
+    name: 'South America',
     type: 'folder',
-    description: 'Red things are cool',
+    description: 'A few markers in South America',
   },
   {
     id: '4',
-    name: 'red 4',
-    latitude: 0,
-    longitude: 0,
+    name: 'Buenos Aires',
+    latitude: -34.6037,
+    longitude: -58.3816,
     parentId: '3',
     type: 'referencePoint',
-    description: 'a small red thing',
+    description: 'Buenos Aires is the capital of Argentina',
+  },
+  {
+    id: '5',
+    name: 'Sao Paulo',
+    latitude: -23.5505,
+    longitude: -46.6333,
+    parentId: '3',
+    type: 'referencePoint',
+    description: 'Sao Paulo is a large city in Brazil',
   },
 ];
+
+const LOCAL_ROW_DATA_KEY = 'rowData';
+const LOCAL_NEW_ROW_DATA_KEY = 'newRowData';
+
+function getInitialData(key: string, defaultRowData: Child[]) {
+  const existingData = JSON.parse(localStorage.getItem(key) ?? '[]');
+  return existingData.length > 0 ? existingData : defaultRowData;
+}
 
 function validField(key: string, row: Child) {
   const value = row[key as keyof Child];
@@ -72,8 +89,12 @@ function App() {
   const containerId = useRef<string>(createDivName());
   const viewer = useCreateViewer(containerId.current);
   const mousePosition = useMousePosition(viewer);
-  const [rowData, setRowData] = useState<Child[]>(defaultRowData);
-  const [newRowData, setNewRowData] = useState<Child[]>([]);
+  const [rowData, setRowData] = useState<Child[]>(
+    getInitialData(LOCAL_ROW_DATA_KEY, defaultRowData),
+  );
+  const [newRowData, setNewRowData] = useState<Child[]>(
+    getInitialData(LOCAL_NEW_ROW_DATA_KEY, []),
+  );
   const [collapsed, setCollapsed] = useState(false);
   const [editId, setEditId] = useState<string | undefined>(undefined);
 
@@ -116,6 +137,14 @@ function App() {
     },
     [rowData, newRowData],
   );
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_ROW_DATA_KEY, JSON.stringify(rowData));
+  }, [rowData]);
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_NEW_ROW_DATA_KEY, JSON.stringify(newRowData));
+  }, [newRowData]);
 
   const onCloseModal = useCallback(() => {
     setEditId(undefined);
