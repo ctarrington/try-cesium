@@ -29,7 +29,8 @@ function updateBillboards(
     const position = Cartesian3.fromDegrees(longitude, latitude, 0, ellipsoid);
     const image = svgPin;
     const billboard =
-      billboardMap[id] || billboardCollection.add({ position, image });
+      billboardMap[id] ||
+      billboardCollection.add({ position, scale: 1.5, image });
     billboardMap[id] = billboard;
 
     billboard.position = position;

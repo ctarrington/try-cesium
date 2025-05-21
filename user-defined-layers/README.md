@@ -29,15 +29,17 @@ npm run dev
 - [x] collapsed shows just buttons on the left
 - [x] show a modal dialog for the new ref point
 - [x] show a modal dialog from an action on the row
-------------------------------
 - [x] show the reference points on the map 
-- [ ] make a reference point editable on click
-- [ ] make a reference point be draggable during edit
-- [ ] error on drag when table is opened!?!? - use shadow billboard and leave current row alone till drag stops
-- [ ] on new, put it into drag mode from jump
+- [x] make a reference point editable on click
+- [x] make a reference point be draggable during edit
+- [x] error on drag when table is opened!?!? - use shadow billboard and leave current row alone till drag stops
 ------------------------------
-- [ ] use icons in the table
-- [ ] use icons in the buttons
+- [ ] add local storage
+- [ ] fly to on row icon
+------------------------------
+- [ ] on new, put it into drag mode from jump
+- [x] use icons in the table
+- [x] use icons in the buttons
 - [ ] DRY out the models
 - [ ] experiment with opacity and on mouse in and out
 - [ ] Add a second model type - circle

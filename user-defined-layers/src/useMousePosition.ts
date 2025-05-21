@@ -23,7 +23,6 @@ export const useMousePosition = (viewer: Viewer | null) => {
 
     const container = viewer.canvas.parentElement as HTMLElement;
     const onMouseLeave = () => {
-      console.log('Mouse left the viewer');
       setLatitude(null);
       setLongitude(null);
       setScreenX(null);
@@ -33,17 +32,13 @@ export const useMousePosition = (viewer: Viewer | null) => {
     };
     container?.addEventListener('mouseleave', onMouseLeave);
 
-    const onLeftUp: ScreenSpaceEventHandler.PositionedEventCallback = ({
-      position,
-    }: ScreenSpaceEventHandler.PositionedEvent) => {
-      console.log('Mouse left up', position);
+    const onLeftUp: ScreenSpaceEventHandler.PositionedEventCallback = () => {
       setDragging(false);
     };
 
     const onLeftDown: ScreenSpaceEventHandler.PositionedEventCallback = ({
       position,
     }: ScreenSpaceEventHandler.PositionedEvent) => {
-      console.log('Mouse left down', position);
       const cartesianPosition: Cartesian3 = viewer.scene.pickPosition(position);
       if (cartesianPosition) {
         const ids: string[] = viewer.scene
