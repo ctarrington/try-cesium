@@ -1,6 +1,6 @@
 import './App.css';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useCreateViewer } from './useCreateViewer.ts';
 import { useMousePosition } from './useMousePosition.ts';
@@ -136,7 +136,38 @@ function App() {
     }
   }, []);
 
-  console.log('Mouse Position:', mousePosition);
+  console.log(
+    'Mouse Position:',
+    mousePosition?.latitude?.toFixed(1),
+    mousePosition?.dragging,
+    mousePosition?.currentId,
+  );
+
+  useEffect(() => {
+    if (!mousePosition) {
+      return;
+    }
+
+    const { currentId, dragging } = mousePosition;
+    if (!currentId) {
+      return;
+    }
+
+    if (currentId !== editId && dragging) {
+      setEditId(currentId);
+    }
+
+    if (currentId === editId && dragging) {
+      const { latitude, longitude } = mousePosition;
+      const newRow = rowData.find((row) => row.id === currentId);
+      if (newRow) {
+        const newRefPoint = { ...newRow } as ReferencePoint;
+        newRefPoint.latitude = latitude ?? 0;
+        newRefPoint.longitude = longitude ?? 0;
+        upsertRow(newRefPoint as Child);
+      }
+    }
+  }, [mousePosition, editId]);
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
