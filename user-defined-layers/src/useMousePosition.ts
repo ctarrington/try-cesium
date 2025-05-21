@@ -13,6 +13,7 @@ export type MousePosition = {
   longitude: number | null;
   screenX: number | null;
   screenY: number | null;
+  currentId?: string;
 };
 
 const emptyMousePosition: MousePosition = {
@@ -20,6 +21,7 @@ const emptyMousePosition: MousePosition = {
   longitude: null,
   screenX: null,
   screenY: null,
+  currentId: undefined,
 };
 
 export const useMousePosition = (viewer: Viewer | null) => {
@@ -55,13 +57,24 @@ export const useMousePosition = (viewer: Viewer | null) => {
           );
         const latitude = Cesium.Math.toDegrees(cartographicPosition.latitude);
         const longitude = Cesium.Math.toDegrees(cartographicPosition.longitude);
-        const { x: screenX, y: screenY } = motionEvent.endPosition;
+        const { endPosition } = motionEvent;
+        const { x: screenX, y: screenY } = endPosition;
+
+        const ids: string[] = viewer.scene
+          .drillPick(endPosition, 10, 20, 20)
+          .filter((p) => {
+            return !!p.id;
+          })
+          .map((p) => p.id);
+
+        const currentId = ids.length > 0 ? ids[0] : undefined;
 
         setMousePosition({
           latitude,
           longitude,
           screenX,
           screenY,
+          currentId,
         });
       }
     };

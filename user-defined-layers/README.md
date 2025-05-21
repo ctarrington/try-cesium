@@ -31,8 +31,8 @@ npm run dev
 - [x] show a modal dialog from an action on the row
 ------------------------------
 - [x] show the reference points on the map 
+- [ ] make a reference point editable on click
 - [ ] make a reference point be draggable during edit
-- [ ] make a reference point editable on double click
 ------------------------------
 - [ ] use icons in the table
 - [ ] use icons in the buttons
