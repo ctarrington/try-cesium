@@ -82,9 +82,11 @@ export function ModalEditor({
         position: 'absolute',
         top: 5,
         right: 5,
+        padding: '4px',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         display: 'grid',
         gridTemplateColumns: '1fr 3fr',
+        gap: '4px',
       }}
     >
       <label>Name</label>

@@ -215,6 +215,7 @@ function MarkupTable({
       pinnedTopRowData={newRowData}
       getRowStyle={getRowStyle}
       enableAdvancedFilter={true}
+      excludeChildrenWhenTreeDataFiltering={true}
     />
   );
 

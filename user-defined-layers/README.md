@@ -37,7 +37,7 @@ npm run dev
 - [x] add local storage
 - [x] fly to on row icon
 - [ ] hide description in table? 
-- [ ] better looking edit modal
+- [x] better looking edit modal
 - [ ] better names for rowData and newRowData
 ------------------------------
 - [ ] on new, put it into drag mode from jump
