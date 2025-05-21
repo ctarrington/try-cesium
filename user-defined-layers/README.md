@@ -35,8 +35,9 @@ npm run dev
 - [x] error on drag when table is opened!?!? - use shadow billboard and leave current row alone till drag stops
 ------------------------------
 - [x] add local storage
-- [ ] fly to on row icon
+- [x] fly to on row icon
 - [ ] hide description in table? 
+- [ ] better looking edit modal
 - [ ] better names for rowData and newRowData
 ------------------------------
 - [ ] on new, put it into drag mode from jump

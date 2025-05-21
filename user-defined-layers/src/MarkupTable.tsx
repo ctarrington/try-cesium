@@ -22,8 +22,10 @@ import { AdvancedFilterModule, TreeDataModule } from 'ag-grid-enterprise';
 
 import { useCallback } from 'react';
 
-import type { Child } from './model.ts';
+import type { Child, ReferencePoint } from './model.ts';
 import { AddMarkupButtonBar } from './AddMarkupButtonBar.tsx';
+import { FlightTakeoff } from '@mui/icons-material';
+import { Cartesian3, Viewer } from 'cesium';
 
 // Register all Community features
 ModuleRegistry.registerModules([
@@ -41,6 +43,7 @@ interface CarTableProps {
   upsertRow: (row: Child) => void;
   collapsed: boolean;
   onOpenModal: (id: string | undefined) => void;
+  viewer: Viewer | null;
 }
 
 function getAncestors(rowData: Child[], id: string): string[] {
@@ -76,6 +79,7 @@ function MarkupTable({
   upsertRow,
   collapsed,
   onOpenModal,
+  viewer,
 }: CarTableProps) {
   // see https://www.ag-grid.com/react-data-grid/value-setters/
   const childValueSetter: ValueSetterFunc<Child> = useCallback(
@@ -125,6 +129,19 @@ function MarkupTable({
     [rowData, upsertRow],
   );
 
+  const onFlyTo = useCallback(
+    (latitude: number, longitude: number) => {
+      if (!viewer) {
+        return;
+      }
+      viewer.camera.flyTo({
+        destination: Cartesian3.fromDegrees(longitude, latitude, 9000),
+        duration: 4,
+      });
+    },
+    [viewer],
+  );
+
   // Column Definitions: Defines the columns to be displayed.
   const actionsRenderer = useCallback(
     (params: IRowNode<Child>) => {
@@ -132,14 +149,27 @@ function MarkupTable({
         return null;
       }
 
+      const referencePoint = params.data as ReferencePoint;
+
       return (
-        <button
-          style={{ background: 'white' }}
-          type="button"
-          onClick={() => onOpenModal(params.data?.id)}
-        >
-          <EditIcon />
-        </button>
+        <>
+          <button
+            style={{ background: 'white' }}
+            type="button"
+            onClick={() => onOpenModal(referencePoint.id)}
+          >
+            <EditIcon />
+          </button>
+          <button
+            style={{ background: 'white' }}
+            type="button"
+            onClick={() =>
+              onFlyTo(referencePoint.latitude, referencePoint.longitude)
+            }
+          >
+            <FlightTakeoff />
+          </button>
+        </>
       );
     },
     [onOpenModal],

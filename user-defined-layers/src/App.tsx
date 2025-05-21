@@ -205,6 +205,19 @@ function App() {
     }
   }, [mousePosition, editId]);
 
+  const markupTable = viewer ? (
+    <MarkupTable
+      rowData={rowData}
+      newRowData={newRowData}
+      upsertRow={upsertRow}
+      collapsed={collapsed}
+      onOpenModal={onOpenModal}
+      viewer={viewer}
+    />
+  ) : (
+    <div>Loading</div>
+  );
+
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <div>
@@ -216,13 +229,7 @@ function App() {
             maxSize={50}
             onResize={onResize}
           >
-            <MarkupTable
-              rowData={rowData}
-              newRowData={newRowData}
-              upsertRow={upsertRow}
-              collapsed={collapsed}
-              onOpenModal={onOpenModal}
-            />
+            {markupTable}
           </Panel>
           <PanelResizeHandle />
           <Panel>
