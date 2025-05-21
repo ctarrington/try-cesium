@@ -136,12 +136,14 @@ function App() {
     }
   }, []);
 
+  /*
   console.log(
     'Mouse Position:',
     mousePosition?.latitude?.toFixed(1),
     mousePosition?.dragging,
     mousePosition?.currentId,
   );
+*/
 
   useEffect(() => {
     if (!mousePosition) {

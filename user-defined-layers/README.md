@@ -33,11 +33,12 @@ npm run dev
 - [x] show the reference points on the map 
 - [ ] make a reference point editable on click
 - [ ] make a reference point be draggable during edit
+- [ ] error on drag when table is opened!?!? - use shadow billboard and leave current row alone till drag stops
+- [ ] on new, put it into drag mode from jump
 ------------------------------
 - [ ] use icons in the table
 - [ ] use icons in the buttons
 - [ ] DRY out the models
 - [ ] experiment with opacity and on mouse in and out
 - [ ] Add a second model type - circle
-- [ ] 
 - [ ] 
