@@ -98,7 +98,10 @@ function MarkupTable({
 
   const groupValueGetter: ValueGetterFunc<Child> = useCallback(
     (params: ValueGetterParams<Child>) => {
-      return params.data?.type ?? 'what';
+      if (params.data?.type === 'folder') {
+        return '\u002B';
+      }
+      return '\u23FA';
     },
     [],
   );
