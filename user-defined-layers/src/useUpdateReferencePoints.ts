@@ -30,7 +30,11 @@ function updateBillboards(
     const image = svgPin;
     const billboard =
       billboardMap[id] ||
-      billboardCollection.add({ position, scale: 1.5, image });
+      billboardCollection.add({
+        position,
+        scale: 1.5,
+        image,
+      });
     billboardMap[id] = billboard;
 
     billboard.position = position;

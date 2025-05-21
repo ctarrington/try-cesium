@@ -134,9 +134,9 @@ function MarkupTable({
       if (!viewer) {
         return;
       }
-      viewer.camera.flyTo({
+      viewer.scene.camera.flyTo({
         destination: Cartesian3.fromDegrees(longitude, latitude, 9000),
-        duration: 4,
+        duration: 6,
       });
     },
     [viewer],

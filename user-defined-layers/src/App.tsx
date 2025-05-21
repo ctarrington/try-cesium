@@ -124,12 +124,18 @@ function App() {
 
   useEffect(() => {
     setTimeout(() => {
-      if (!viewer) {
+      if (!viewer || viewer.isDestroyed()) {
         const newViewer = new Viewer(containerId.current, options);
         setViewer(newViewer);
       }
     }, 100);
-  }, []);
+
+    return () => {
+      if (viewer && !viewer.isDestroyed()) {
+        viewer.destroy();
+      }
+    };
+  }, [viewer]);
 
   // edit or create
   const upsertRow = useCallback(

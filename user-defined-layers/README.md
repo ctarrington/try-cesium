@@ -33,13 +33,17 @@ npm run dev
 - [x] make a reference point editable on click
 - [x] make a reference point be draggable during edit
 - [x] error on drag when table is opened!?!? - use shadow billboard and leave current row alone till drag stops
-------------------------------
 - [x] add local storage
 - [x] fly to on row icon
-- [ ] hide description in table? 
 - [x] better looking edit modal
-- [ ] better names for rowData and newRowData
 ------------------------------
+- [ ] figure out viewer order race thing
+- [ ] turn off filtering
+- [ ] use name as group
+- [ ] hide description in table?
+- [ ] verify on another machine
+------------------------------
+- [ ] better names for rowData and newRowData
 - [ ] on new, put it into drag mode from jump
 - [x] use icons in the table
 - [x] use icons in the buttons
