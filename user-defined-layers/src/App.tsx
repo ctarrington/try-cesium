@@ -4,10 +4,11 @@ import { useCallback, useRef, useState } from 'react';
 
 import { useCreateViewer } from './useCreateViewer.ts';
 import { useMousePosition } from './useMousePosition.ts';
-import type { Child } from './model.ts';
+import type { Child, ReferencePoint } from './model.ts';
 import MarkupTable from './MarkupTable.tsx';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { ModalEditor } from './ModalEditor.tsx';
+import { useUpdateReferencePoints } from './useUpdateReferencePoints.ts';
 
 const defaultRowData: Child[] = [
   {
@@ -76,6 +77,11 @@ function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [editId, setEditId] = useState<string | undefined>(undefined);
 
+  const referencePoints = rowData.filter(
+    (row) => row.type === 'referencePoint',
+  ) as ReferencePoint[];
+  useUpdateReferencePoints(referencePoints, viewer);
+
   // edit or create
   const upsertRow = useCallback(
     (newRow: Child) => {
@@ -116,7 +122,7 @@ function App() {
   }, [setEditId]);
 
   const onOpenModal = useCallback(
-    (id: string) => {
+    (id: string | undefined) => {
       setEditId(id);
     },
     [setEditId],
@@ -131,8 +137,6 @@ function App() {
   }, []);
 
   console.log('Mouse Position:', mousePosition);
-  console.log('newRowData:', newRowData);
-  console.log('rowData:', rowData);
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>

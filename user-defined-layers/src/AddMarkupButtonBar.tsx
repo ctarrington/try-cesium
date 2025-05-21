@@ -1,4 +1,8 @@
 import { useCallback } from 'react';
+
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import AddLocationIcon from '@mui/icons-material/AddLocation';
+
 import type { Child } from './model.ts';
 
 interface AddMarkupButtonBarProps {
@@ -8,7 +12,7 @@ interface AddMarkupButtonBarProps {
 export function AddMarkupButtonBar({ upsertRow }: AddMarkupButtonBarProps) {
   const createFolder = useCallback(() => {
     const newRow = {
-      id: `${Math.random()}`,
+      id: `${Date.now()}`,
       name: 'Name...',
       type: 'folder',
       description: 'Description...',
@@ -18,7 +22,7 @@ export function AddMarkupButtonBar({ upsertRow }: AddMarkupButtonBarProps) {
 
   const createReferencePoint = useCallback(() => {
     const newRow = {
-      id: `${Math.random()}`,
+      id: `${Date.now()}`,
       name: 'Name...',
       type: 'referencePoint',
       description: 'Description...',
@@ -30,10 +34,10 @@ export function AddMarkupButtonBar({ upsertRow }: AddMarkupButtonBarProps) {
   return (
     <div>
       <button type="button" onClick={createFolder}>
-        +F
+        <CreateNewFolderIcon />
       </button>
       <button type="button" onClick={createReferencePoint}>
-        +P
+        <AddLocationIcon />
       </button>
     </div>
   );

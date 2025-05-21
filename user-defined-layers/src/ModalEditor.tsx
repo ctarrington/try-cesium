@@ -55,9 +55,13 @@ export function ModalEditor({
 
       const newRefPoint = { ...newRow } as ReferencePoint;
       const key = field as keyof ReferencePoint;
+
+      const adjustedValue = ['longitude', 'latitude'].includes(key)
+        ? parseFloat(value)
+        : value;
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
-      newRefPoint[key] = value;
+      newRefPoint[key] = adjustedValue;
       upsertRow(newRefPoint);
     },
     [editId, rowData, newRowData, upsertRow],

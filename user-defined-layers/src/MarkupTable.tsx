@@ -2,6 +2,8 @@ import './App.css';
 
 import { AgGridReact } from 'ag-grid-react';
 
+import EditIcon from '@mui/icons-material/Edit';
+
 import {
   AllCommunityModule,
   type ColDef,
@@ -123,14 +125,17 @@ function MarkupTable({
   // Column Definitions: Defines the columns to be displayed.
   const actionsRenderer = useCallback(
     (params: IRowNode<Child>) => {
-      console.log('actionsRenderer', params);
       if (params.data?.type !== 'referencePoint') {
         return null;
       }
 
       return (
-        <button type="button" onClick={() => onOpenModal(params.data?.id)}>
-          hi
+        <button
+          style={{ background: 'white' }}
+          type="button"
+          onClick={() => onOpenModal(params.data?.id)}
+        >
+          <EditIcon />
         </button>
       );
     },
