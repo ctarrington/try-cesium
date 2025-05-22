@@ -41,7 +41,6 @@ npm run dev
 - [x] turn off filtering
 - [x] use name as group
 - [x] hide description in table
-- [ ] verify on another machine
 ------------------------------
 - [ ] better names for rowData and newRowData
 - [ ] on new, put it into drag mode from jump
