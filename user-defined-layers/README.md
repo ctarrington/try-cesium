@@ -38,6 +38,7 @@ npm run dev
 - [x] better looking edit modal
 ------------------------------
 - [ ] figure out viewer order race thing
+- [ ] on mac if you fly to before going to the map it dorks everything?!
 - [ ] turn off filtering
 - [ ] use name as group
 - [ ] hide description in table?

@@ -21,30 +21,29 @@ const options = {
   scene3DOnly: true,
 };
 
+let loading = false;
+
 export const useCreateViewer = (containerId: string) => {
   const [viewer, setViewer] = useState<Viewer | null>(null);
 
   useEffect(() => {
-    if (!viewer) {
-      createViewer(containerId).then((viewer: Viewer) => {
-        setViewer(viewer);
-      });
+    if (!viewer || (viewer.isDestroyed() && !loading)) {
+      loading = true;
+      const newViewer = new Viewer(containerId, options);
+      setTimeout(() => {
+        setViewer(newViewer);
+        loading = false;
+      }, 100);
     }
 
     return () => {
-      if (viewer) {
+      if (viewer && !viewer.isDestroyed()) {
         viewer.destroy();
+        setViewer(null);
+        loading = false;
       }
     };
-  }, [containerId, viewer]);
+  }, [containerId, viewer, setViewer]);
 
   return viewer;
-};
-
-const createViewer = async (containerId: string): Promise<Viewer> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(new Viewer(containerId, options));
-    }, 1000);
-  });
 };
