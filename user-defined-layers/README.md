@@ -37,16 +37,14 @@ npm run dev
 - [x] fly to on row icon
 - [x] better looking edit modal
 ------------------------------
-- [ ] figure out viewer order race thing
-- [ ] on mac if you fly to before going to the map it dorks everything?!
-- [ ] turn off filtering
-- [ ] use name as group
-- [ ] hide description in table?
+- [x] figure out viewer order race thing
+- [x] turn off filtering
+- [x] use name as group
+- [x] hide description in table
 - [ ] verify on another machine
 ------------------------------
 - [ ] better names for rowData and newRowData
 - [ ] on new, put it into drag mode from jump
-- [x] use icons in the table
 - [x] use icons in the buttons
 - [ ] DRY out the models
 - [ ] experiment with opacity and on mouse in and out

@@ -14,11 +14,9 @@ import {
   RowDragModule,
   type ValueGetterFunc,
   type ValueGetterParams,
-  type ValueSetterFunc,
-  type ValueSetterParams,
 } from 'ag-grid-community';
 
-import { AdvancedFilterModule, TreeDataModule } from 'ag-grid-enterprise';
+import { TreeDataModule } from 'ag-grid-enterprise';
 
 import { useCallback } from 'react';
 
@@ -29,7 +27,6 @@ import { Cartesian3, Viewer } from 'cesium';
 
 // Register all Community features
 ModuleRegistry.registerModules([
-  AdvancedFilterModule,
   AllCommunityModule,
   RowDragModule,
   TreeDataModule,
@@ -81,31 +78,9 @@ function MarkupTable({
   onOpenModal,
   viewer,
 }: CarTableProps) {
-  // see https://www.ag-grid.com/react-data-grid/value-setters/
-  const childValueSetter: ValueSetterFunc<Child> = useCallback(
-    (params: ValueSetterParams<Child>) => {
-      const { data: newRow, colDef, newValue } = params;
-      if (!colDef.field) {
-        return false;
-      }
-
-      const newRefPoint = { ...newRow } as Child;
-      const key = colDef.field as keyof Child;
-
-      newRefPoint[key] = newValue as string;
-      upsertRow(newRefPoint as Child);
-
-      return true;
-    },
-    [upsertRow],
-  );
-
   const groupValueGetter: ValueGetterFunc<Child> = useCallback(
     (params: ValueGetterParams<Child>) => {
-      if (params.data?.type === 'folder') {
-        return '\u002B';
-      }
-      return '\u23FA';
+      return params.data?.name;
     },
     [],
   );
@@ -172,27 +147,14 @@ function MarkupTable({
         </>
       );
     },
-    [onOpenModal],
+    [onOpenModal, onFlyTo],
   );
 
   const colDefs: ColDef[] = [
     {
-      field: 'name',
-      filter: true,
-      editable: true,
-      valueSetter: childValueSetter,
-    },
-    {
-      field: 'description',
-      filter: true,
-      editable: true,
-      valueSetter: childValueSetter,
-      cellEditor: 'agLargeTextCellEditor',
-      cellEditorPopup: true,
-    },
-    {
       field: 'actions',
       cellRenderer: actionsRenderer,
+      sortable: false,
     },
   ];
 
@@ -214,8 +176,6 @@ function MarkupTable({
       onRowDragEnd={onRowDragEnd}
       pinnedTopRowData={newRowData}
       getRowStyle={getRowStyle}
-      enableAdvancedFilter={true}
-      excludeChildrenWhenTreeDataFiltering={true}
     />
   );
 

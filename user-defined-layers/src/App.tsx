@@ -233,7 +233,7 @@ function App() {
             collapsible={true}
             collapsedSize={5}
             minSize={5}
-            maxSize={50}
+            maxSize={20}
             onResize={onResize}
           >
             {markupTable}
