@@ -42,10 +42,14 @@ npm run dev
 - [x] use name as group
 - [x] hide description in table
 ------------------------------
-- [ ] refactor and use more use*
-- [ ] need a way to edit folder names
+- [x] refactor and use more use* for MarkupData
+- [x] need a way to edit folder names
+- [ ] DRY out the creation of the edit fields
 - [ ] is there a better way split out the upsert logic?
 - [ ] better names for rowData and newRowData
+- [ ] better names for upsert*
+- [ ] refactor and use even more use* for MarkupData
+- [ ] better names for lots of stuff
 ------------------------------
 - [ ] better minimum size for the table? collapses down to nothing and the icons pop out and live absolute left?
 - [ ] calculate the max and default percentages for the tree table from pixels? https://github.com/bvaughn/react-resizable-panels/issues/46#issuecomment-1368108416

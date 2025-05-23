@@ -1,54 +1,64 @@
 import type { Child, ReferencePoint } from './model.ts';
 import { useCallback } from 'react';
 
-function findRowById(
-  rowData: Child[],
-  newRowData: Child[],
+function findChildById(
+  markupData: Child[],
+  provisionalMarkupData: Child[],
   id: string,
-): ReferencePoint | null {
-  const matchExistingIndex = rowData.findIndex((row) => row.id === id);
-  const matchNewIndex = newRowData.findIndex((row) => row.id === id);
+): Child | null {
+  const matchExistingIndex = markupData.findIndex((row) => row.id === id);
+  const matchProvisionalIndex = provisionalMarkupData.findIndex(
+    (row) => row.id === id,
+  );
 
-  if (matchExistingIndex === -1 && matchNewIndex === -1) {
+  if (matchExistingIndex === -1 && matchProvisionalIndex === -1) {
     return null;
   }
 
   if (matchExistingIndex !== -1) {
-    const existingRow = rowData[matchExistingIndex];
-    if (existingRow.type !== 'referencePoint') {
-      return null;
-    }
-    return rowData[matchExistingIndex] as ReferencePoint;
+    return markupData[matchExistingIndex];
   }
 
-  if (matchNewIndex !== -1) {
-    const newRow = newRowData[matchNewIndex];
-    if (newRow.type !== 'referencePoint') {
-      return null;
-    }
-    return newRowData[matchNewIndex] as ReferencePoint;
+  if (matchProvisionalIndex !== -1) {
+    return provisionalMarkupData[matchProvisionalIndex];
   }
 
   return null;
 }
 
 interface ModalEditorProps {
-  rowData: Child[];
-  newRowData: Child[];
+  markupData: Child[];
+  provisionalMarkupData: Child[];
   upsertRow: (newRow: Child) => void;
   editId?: string;
   onClose: () => void;
 }
 export function ModalEditor({
-  rowData,
-  newRowData,
+  markupData,
+  provisionalMarkupData,
   upsertRow,
   editId,
   onClose,
 }: ModalEditorProps) {
   const updateField = useCallback(
     (field: string, value: string) => {
-      const newRow = findRowById(rowData, newRowData, editId!);
+      const newRow = findChildById(markupData, provisionalMarkupData, editId!);
+      if (!newRow) {
+        return;
+      }
+
+      const newChild = { ...newRow } as Child;
+      const key = field as keyof Child;
+
+      newChild[key] = value;
+      upsertRow(newChild);
+    },
+    [editId, markupData, provisionalMarkupData, upsertRow],
+  );
+
+  const updateRefPointField = useCallback(
+    (field: string, value: string) => {
+      const newRow = findChildById(markupData, provisionalMarkupData, editId!);
       if (!newRow) {
         return;
       }
@@ -56,22 +66,78 @@ export function ModalEditor({
       const newRefPoint = { ...newRow } as ReferencePoint;
       const key = field as keyof ReferencePoint;
 
-      const adjustedValue = ['longitude', 'latitude'].includes(key)
-        ? parseFloat(value)
-        : value;
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
-      newRefPoint[key] = adjustedValue;
+      newRefPoint[key] = ['longitude', 'latitude'].includes(key)
+        ? parseFloat(value)
+        : value;
       upsertRow(newRefPoint);
     },
-    [editId, rowData, newRowData, upsertRow],
+    [editId, markupData, provisionalMarkupData, upsertRow],
+  );
+
+  const createChildFields = useCallback(
+    ({ name, description }: Child) => {
+      return (
+        <>
+          <label>Name</label>
+          <input
+            type={'text'}
+            value={name}
+            onChange={(e) => {
+              updateField('name', e.target.value);
+            }}
+          />
+          <label>Description</label>
+          <input
+            type={'text'}
+            value={description}
+            onChange={(e) => {
+              updateField('description', e.target.value);
+            }}
+          />
+        </>
+      );
+    },
+    [updateField],
+  );
+
+  const createReferencePointFields = useCallback(
+    (child: Child) => {
+      if (child.type !== 'referencePoint') {
+        return null;
+      }
+
+      const { latitude, longitude } = child as ReferencePoint;
+      return (
+        <>
+          <label>Longitude</label>
+          <input
+            type={'number'}
+            value={longitude}
+            onChange={(e) => {
+              updateRefPointField('longitude', e.target.value);
+            }}
+          />
+          <label>Latitude</label>
+          <input
+            type={'number'}
+            value={latitude}
+            onChange={(e) => {
+              updateRefPointField('latitude', e.target.value);
+            }}
+          />
+        </>
+      );
+    },
+    [updateRefPointField],
   );
 
   if (!editId) {
     return null;
   }
 
-  const editRow = findRowById(rowData, newRowData, editId);
+  const editRow = findChildById(markupData, provisionalMarkupData, editId);
   if (!editRow) {
     return null;
   }
@@ -90,38 +156,8 @@ export function ModalEditor({
         gap: '4px',
       }}
     >
-      <label>Name</label>
-      <input
-        type={'text'}
-        value={editRow.name}
-        onChange={(e) => {
-          updateField('name', e.target.value);
-        }}
-      />
-      <label>Description</label>
-      <input
-        type={'text'}
-        value={editRow.description}
-        onChange={(e) => {
-          updateField('description', e.target.value);
-        }}
-      />
-      <label>Longitude</label>
-      <input
-        type={'number'}
-        value={editRow.longitude}
-        onChange={(e) => {
-          updateField('longitude', e.target.value);
-        }}
-      />
-      <label>Latitude</label>
-      <input
-        type={'number'}
-        value={editRow.latitude}
-        onChange={(e) => {
-          updateField('latitude', e.target.value);
-        }}
-      />
+      {createChildFields(editRow)}
+      {createReferencePointFields(editRow)}
       <div></div>
       <button onClick={onClose}>Close</button>
     </div>

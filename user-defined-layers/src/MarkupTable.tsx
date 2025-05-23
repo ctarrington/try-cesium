@@ -34,23 +34,23 @@ ModuleRegistry.registerModules([
 
 // see https://www.ag-grid.com/javascript-data-grid/tree-data-self-referential/
 
-interface CarTableProps {
-  rowData: Child[];
-  newRowData: Child[];
+interface MarkupTableProps {
+  markupData: Child[];
+  provisionalMarkupData: Child[];
   upsertRow: (row: Child) => void;
   collapsed: boolean;
   onOpenModal: (id: string | undefined) => void;
   viewer: Viewer | null;
 }
 
-function getAncestors(rowData: Child[], id: string): string[] {
-  const match = rowData.find((row) => row.id === id);
+function getAncestors(markupData: Child[], id: string): string[] {
+  const match = markupData.find((row) => row.id === id);
   if (!match) {
     return [];
   } else if (!match.parentId) {
     return [id];
   } else {
-    return [id, ...getAncestors(rowData, match.parentId)];
+    return [id, ...getAncestors(markupData, match.parentId)];
   }
 }
 
@@ -71,13 +71,13 @@ const getRowStyle = (params: RowClassParams) => {
 };
 
 function MarkupTable({
-  rowData,
-  newRowData,
+  markupData,
+  provisionalMarkupData,
   upsertRow,
   collapsed,
   onOpenModal,
   viewer,
-}: CarTableProps) {
+}: MarkupTableProps) {
   const groupValueGetter: ValueGetterFunc<Child> = useCallback(
     (params: ValueGetterParams<Child>) => {
       return params.data?.name;
@@ -92,16 +92,16 @@ function MarkupTable({
       const newParentId = calculateNewParentId(overNode);
 
       // The new parent cannot have the node as an ancestor
-      const ancestorIds: string[] = getAncestors(rowData, newParentId);
+      const ancestorIds: string[] = getAncestors(markupData, newParentId);
       if (ancestorIds.includes(node.data.id)) {
         return false;
       }
 
-      const newRowData = { ...node.data };
-      newRowData.parentId = newParentId;
-      upsertRow(newRowData);
+      const provisionalMarkupData = { ...node.data };
+      provisionalMarkupData.parentId = newParentId;
+      upsertRow(provisionalMarkupData);
     },
-    [rowData, upsertRow],
+    [markupData, upsertRow],
   );
 
   const onFlyTo = useCallback(
@@ -117,37 +117,57 @@ function MarkupTable({
     [viewer],
   );
 
-  // Column Definitions: Defines the columns to be displayed.
-  const actionsRenderer = useCallback(
-    (params: IRowNode<Child>) => {
-      if (params.data?.type !== 'referencePoint') {
+  const createEditButton = useCallback(
+    (child: Child) => {
+      return (
+        <button
+          style={{ background: 'white' }}
+          type="button"
+          onClick={() => onOpenModal(child.id)}
+        >
+          <EditIcon />
+        </button>
+      );
+    },
+    [onOpenModal],
+  );
+
+  const createFlyToButton = useCallback(
+    (child: Child) => {
+      if (child.type === 'folder') {
         return null;
       }
 
-      const referencePoint = params.data as ReferencePoint;
+      const { latitude, longitude } = child as ReferencePoint;
+
+      return (
+        <button
+          style={{ background: 'white' }}
+          type="button"
+          onClick={() => onFlyTo(latitude, longitude)}
+        >
+          <FlightTakeoff />
+        </button>
+      );
+    },
+    [onFlyTo],
+  );
+
+  // render the action buttons
+  const actionsRenderer = useCallback(
+    ({ data: child }: IRowNode<Child>) => {
+      if (!child) {
+        return null;
+      }
 
       return (
         <>
-          <button
-            style={{ background: 'white' }}
-            type="button"
-            onClick={() => onOpenModal(referencePoint.id)}
-          >
-            <EditIcon />
-          </button>
-          <button
-            style={{ background: 'white' }}
-            type="button"
-            onClick={() =>
-              onFlyTo(referencePoint.latitude, referencePoint.longitude)
-            }
-          >
-            <FlightTakeoff />
-          </button>
+          {createEditButton(child)}
+          {createFlyToButton(child)}
         </>
       );
     },
-    [onOpenModal, onFlyTo],
+    [createEditButton, createFlyToButton],
   );
 
   const colDefs: ColDef[] = [
@@ -161,7 +181,7 @@ function MarkupTable({
   const grid = collapsed ? undefined : (
     <AgGridReact
       treeData={true}
-      rowData={rowData}
+      rowData={markupData}
       columnDefs={colDefs}
       groupDefaultExpanded={-1}
       autoGroupColumnDef={{
@@ -174,7 +194,7 @@ function MarkupTable({
       getRowId={(params) => params.data.id}
       treeDataParentIdField="parentId"
       onRowDragEnd={onRowDragEnd}
-      pinnedTopRowData={newRowData}
+      pinnedTopRowData={provisionalMarkupData}
       getRowStyle={getRowStyle}
     />
   );

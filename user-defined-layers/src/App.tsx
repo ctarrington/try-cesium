@@ -12,7 +12,7 @@ import { useUpdateReferencePoints } from './useUpdateReferencePoints.ts';
 import * as Cesium from 'cesium';
 import { ACCESS_TOKEN } from './dontcheckin';
 import { useCreateViewer } from './useCreateViewer.ts';
-import { useLoadMarkupData } from './useLoadMarkupData.ts';
+import { useMarkupData } from './useMarkupData.ts';
 
 // Your access token can be found at: https://cesium.com/ion/tokens.
 // In this project, we're using a token stored in a separate file that is not checked in.
@@ -23,10 +23,15 @@ function App() {
   const viewer = useCreateViewer(containerId.current);
   const mousePosition = useMousePosition(viewer);
   const [collapsed, setCollapsed] = useState(false);
-  const { rowData, newRowData, upsertRow, editId, setEditId } =
-    useLoadMarkupData();
+  const {
+    markupData,
+    provisionalMarkupData,
+    upsertMarkupData,
+    editId,
+    setEditId,
+  } = useMarkupData();
 
-  const referencePoints = rowData.filter(
+  const referencePoints = markupData.filter(
     (row) => row.type === 'referencePoint',
   ) as ReferencePoint[];
   useUpdateReferencePoints(referencePoints, viewer);
@@ -66,7 +71,7 @@ function App() {
 
     if (currentId === editId && dragging) {
       const { latitude, longitude } = mousePosition;
-      const newRow = rowData.find((row) => row.id === currentId);
+      const newRow = markupData.find((row) => row.id === currentId);
       if (newRow) {
         const newRefPoint = { ...newRow } as ReferencePoint;
         const oldRefPoint = { ...newRow } as ReferencePoint;
@@ -85,16 +90,16 @@ function App() {
           return;
         }
 
-        upsertRow(newRefPoint as Child);
+        upsertMarkupData(newRefPoint as Child);
       }
     }
-  }, [mousePosition, rowData, editId, upsertRow]);
+  }, [mousePosition, markupData, editId, upsertMarkupData]);
 
   const markupTable = viewer ? (
     <MarkupTable
-      rowData={rowData}
-      newRowData={newRowData}
-      upsertRow={upsertRow}
+      markupData={markupData}
+      provisionalMarkupData={provisionalMarkupData}
+      upsertRow={upsertMarkupData}
       collapsed={collapsed}
       onOpenModal={onOpenModal}
       viewer={viewer}
@@ -123,9 +128,9 @@ function App() {
         </PanelGroup>
       </div>
       <ModalEditor
-        rowData={rowData}
-        newRowData={newRowData}
-        upsertRow={upsertRow}
+        markupData={markupData}
+        provisionalMarkupData={provisionalMarkupData}
+        upsertRow={upsertMarkupData}
         editId={editId}
         onClose={onCloseModal}
       />
