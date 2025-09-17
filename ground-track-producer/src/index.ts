@@ -10,6 +10,7 @@ import { dropBreadcrumb, raiseCartesian } from './cesium-helpers';
 import { AirPursuitPathCalculator } from './AirPursuitPathCalculator';
 import { PursuitViewCamera } from './PursuitViewCamera';
 import { ModelEntity } from './ModelEntity';
+import { storeImage } from './storage';
 
 // Overall logic for the ground track producer.
 // A driver's view camera is updated with the current position and builds a view of the road ahead.
@@ -65,12 +66,16 @@ const pursuitViewer = new Cesium.Viewer('pursuitViewContainer', {
 });
 
 // Maple Lawn, MD
-let currentLongitude = -76.90074;
-let currentLatitude = 39.165914;
+// let currentLongitude = -76.90074;
+// let currentLatitude = 39.165914;
 
 // Liberty Township, Missouri
 //let currentLongitude = -92.410859;
 //let currentLatitude = 37.783029;
+
+// Havover, MD
+let currentLongitude = -76.736939;
+let currentLatitude = 39.212812;
 
 const roadFollowingPathCalculator = new RoadFollowingPathCalculator(
   driversViewer,
@@ -174,6 +179,13 @@ setInterval(() => {
         Cesium.Color.BLUE,
       );
     }
+  }
+
+  if (tick % 97 === 0) {
+    pursuitViewer.render();
+    pursuitViewer.canvas.toBlob((blob) => {
+      storeImage(blob);
+    });
   }
 }, 1000 / FPS);
 
