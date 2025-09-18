@@ -1,4 +1,4 @@
-export const storeImage = (imageData: Blob, tick: number) => {
+export const storeImage = (imageData: Blob, tick: string) => {
   fetch(`http://localhost:3001/store_image/${tick}`, {
     method: 'POST',
     body: imageData,
@@ -12,7 +12,7 @@ export const storeImage = (imageData: Blob, tick: number) => {
     });
 };
 
-export const storeMetadata = (metadata: any, tick: number) => {
+export const storeMetadata = (metadata: any, tick: string) => {
   fetch(`http://localhost:3001/store_metadata/${tick}`, {
     method: 'POST',
     body: JSON.stringify(metadata),

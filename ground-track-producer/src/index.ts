@@ -73,9 +73,13 @@ const pursuitViewer = new Cesium.Viewer('pursuitViewContainer', {
 //let currentLongitude = -92.410859;
 //let currentLatitude = 37.783029;
 
-// Havover, MD
-let currentLongitude = -76.736939;
-let currentLatitude = 39.212812;
+// Hanover, MD
+//let currentLongitude = -76.736939;
+//let currentLatitude = 39.212812;
+
+// Liberty Township, Missouri
+let currentLongitude = -94.400328;
+let currentLatitude = 39.316093;
 
 const roadFollowingPathCalculator = new RoadFollowingPathCalculator(
   driversViewer,
@@ -184,13 +188,14 @@ setInterval(() => {
     }
   }
 
-  if (tick % 2 === 0) {
+  if (tick > 25) {
+    const tickString = (tick - 26).toString().padStart(6, '0');
     pursuitViewer.render();
     pursuitViewer.canvas.toBlob((blob) => {
-      storeImage(blob, tick);
+      storeImage(blob, tickString);
     });
 
-    storeMetadata(metadata, tick);
+    storeMetadata(metadata, tickString);
   }
 
   tick += 1;
