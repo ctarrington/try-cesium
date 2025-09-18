@@ -10,7 +10,7 @@ import { dropBreadcrumb, raiseCartesian } from './cesium-helpers';
 import { AirPursuitPathCalculator } from './AirPursuitPathCalculator';
 import { PursuitViewCamera } from './PursuitViewCamera';
 import { ModelEntity } from './ModelEntity';
-import { storeImage } from './storage';
+import { storeImage, storeMetadata } from './storage';
 
 // Overall logic for the ground track producer.
 // A driver's view camera is updated with the current position and builds a view of the road ahead.
@@ -157,7 +157,10 @@ setInterval(() => {
   milkTruck.update(position);
   aircraft.update(airPursuitPathCalculator.getPosition());
 
-  pursuitViewCamera.update(airPursuitPathCalculator.getPosition(), position);
+  const metadata = pursuitViewCamera.update(
+    airPursuitPathCalculator.getPosition(),
+    position,
+  );
 
   if (tick % 111 === 0) {
     const cartographic = Cesium.Cartographic.fromCartesian(position);
@@ -181,12 +184,16 @@ setInterval(() => {
     }
   }
 
-  if (tick % 97 === 0) {
+  if (tick % 2 === 0) {
     pursuitViewer.render();
     pursuitViewer.canvas.toBlob((blob) => {
-      storeImage(blob);
+      storeImage(blob, tick);
     });
+
+    storeMetadata(metadata, tick);
   }
+
+  tick += 1;
 }, 1000 / FPS);
 
 // todo: add a sensor overlay view

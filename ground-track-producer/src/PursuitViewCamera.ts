@@ -3,6 +3,8 @@ import * as Cesium from 'cesium';
 // a pursuit view camera follows the target from the pursuit aircraft's perspective.
 // See: https://community.cesium.com/t/viewer-camera-lookat-method-change-camera-heading-and-camera-pitch/8800/2
 
+const FOV = Cesium.Math.PI / 100;
+
 export class PursuitViewCamera {
   viewer: Cesium.Viewer;
 
@@ -11,7 +13,7 @@ export class PursuitViewCamera {
 
     const aspectRatio = viewer.canvas.clientWidth / viewer.canvas.clientHeight;
     this.viewer.camera.frustum = new Cesium.PerspectiveFrustum({
-      fov: Cesium.Math.PI / 100,
+      fov: FOV,
       aspectRatio,
     });
   }
@@ -46,5 +48,12 @@ export class PursuitViewCamera {
     up = Cesium.Cartesian3.normalize(up, up);
     camera.up = up;
     camera.position = cameraPosition;
+
+    return {
+      cameraPosition,
+      lookDirection: direction,
+      upDirection: approxUp,
+      fovRadians: FOV,
+    };
   }
 }

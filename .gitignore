@@ -63,3 +63,4 @@ typings/
 DoNotCheckin.ts
 dontcheckin.js
 dist/
+.DS_Store
