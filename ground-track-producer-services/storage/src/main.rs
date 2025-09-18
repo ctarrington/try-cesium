@@ -1,4 +1,6 @@
 use axum::extract::Path;
+use axum::response::IntoResponse;
+use axum::routing::get;
 use axum::{
     Router,
     body::Bytes,
@@ -49,6 +51,18 @@ async fn store_metadata(Path(tick): Path<String>, body: String) -> Result<String
     Ok(format!("Metadata saved as: {}", path))
 }
 
+async fn load_metadata(Path(tick): Path<String>) -> impl IntoResponse {
+    let content =
+        match fs::read_to_string(format!("./{}/metadata_{}.json", UPLOADS_DIRECTORY, tick)).await {
+            Ok(content) => content,
+            Err(e) => {
+                return format!("Error reading metadata page: Error: {}", e);
+            }
+        };
+
+    content
+}
+
 #[tokio::main]
 async fn main() {
     let cors_layer = CorsLayer::new()
@@ -59,6 +73,7 @@ async fn main() {
     let app = Router::new()
         .route("/store_image/{tick}", post(store_image))
         .route("/store_metadata/{tick}", post(store_metadata))
+        .route("/metadata/{tick}", get(load_metadata))
         .layer(cors_layer);
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
