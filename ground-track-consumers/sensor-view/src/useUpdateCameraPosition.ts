@@ -19,7 +19,7 @@ export const useUpdateCameraPosition = (
 
       const { clientWidth, clientHeight } = viewer.canvas;
       const aspectRatio = clientWidth / clientHeight;
-      const zoomedFov = 8.5 * metadata.fovRadians;
+      const zoomedFov = 3.0 * metadata.fovRadians;
       viewer.camera.frustum = new PerspectiveFrustum({
         fov: zoomedFov,
         aspectRatio,

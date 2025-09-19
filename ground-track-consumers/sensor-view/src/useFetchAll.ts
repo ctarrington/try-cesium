@@ -6,6 +6,7 @@ const FPS = 15;
 export const useFetchAll = () => {
   const tick = useRef(0);
   const [metadata, setMetadata] = useState<Metadata | null>(null);
+  const [imageBlob, setImageBlob] = useState<Blob | null>(null);
 
   useEffect(() => {
     console.log("set up interval for fetching metadata");
@@ -22,13 +23,26 @@ export const useFetchAll = () => {
           tick.current = 0;
         });
 
+      if (tick.current > 10) {
+        fetch(`http://localhost:3001/image/${tickString}`)
+          .then((response) => response.blob())
+          .then((newImageBlob) => {
+            console.log("fetched image blob:", newImageBlob.size);
+            setImageBlob(newImageBlob);
+          })
+          .catch((error) => {
+            console.error("Error fetching sensor data:", error);
+            tick.current = 0;
+          });
+      }
+
       tick.current = tick.current + 1;
     }, 1000 / FPS);
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [setMetadata]);
+  }, [setMetadata, setImageBlob]);
 
-  return { metadata };
+  return { metadata, imageBlob };
 };

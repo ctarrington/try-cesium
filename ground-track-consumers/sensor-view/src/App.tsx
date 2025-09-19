@@ -3,36 +3,33 @@ import "./App.css";
 import { useCreateViewer } from "./useCreateViewer.ts";
 import { SensorView } from "./SensorView.tsx";
 import { useRef } from "react";
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useFetchAll } from "./useFetchAll.ts";
 import { useUpdateCameraPosition } from "./useUpdateCameraPosition.ts";
+import { VideoCanvas } from "./VideoCanvas.tsx";
 
 function App() {
-  const containerId = useRef<string>(createDivName());
-  const viewer = useCreateViewer(containerId.current);
+  const cesiumContainerId = useRef<string>(createDivName("cesiumContainer"));
+  const videoCanvasId = useRef<string>(createDivName("videoCanvas"));
+  const viewer = useCreateViewer(cesiumContainerId.current);
 
-  const { metadata } = useFetchAll();
+  const { metadata, imageBlob } = useFetchAll();
   useUpdateCameraPosition(viewer, metadata);
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
-      <div>
-        <PanelGroup direction="horizontal">
-          <Panel collapsible={true} collapsedSize={5} minSize={5} maxSize={50}>
-            <div>This space is blank</div>
-          </Panel>
-          <PanelResizeHandle />
-          <Panel>
-            <SensorView canvasParentId={containerId.current} />
-          </Panel>
-        </PanelGroup>
-      </div>
+      <SensorView canvasParentId={cesiumContainerId.current} />
+      <VideoCanvas
+        videoCanvasId={videoCanvasId.current}
+        imageBlob={imageBlob}
+        metadata={metadata}
+        viewer={viewer}
+      />
     </div>
   );
 }
 
-const createDivName = () => {
-  return "cesiumContainer" + Math.floor(Math.random() * 1000);
+const createDivName = (baseName: string) => {
+  return baseName + Math.floor(Math.random() * 1000);
 };
 
 export default App;
