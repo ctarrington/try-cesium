@@ -1,5 +1,5 @@
 export const storeImage = (imageData: Blob, tick: string) => {
-  fetch(`http://localhost:3001/store_image/${tick}`, {
+  fetch(`http://localhost:3001/image/${tick}`, {
     method: 'POST',
     body: imageData,
     headers: { 'Content-Type': 'image/png' },
@@ -13,7 +13,7 @@ export const storeImage = (imageData: Blob, tick: string) => {
 };
 
 export const storeMetadata = (metadata: any, tick: string) => {
-  fetch(`http://localhost:3001/store_metadata/${tick}`, {
+  fetch(`http://localhost:3001/metadata/${tick}`, {
     method: 'POST',
     body: JSON.stringify(metadata),
     headers: { 'Content-Type': 'application/json' },

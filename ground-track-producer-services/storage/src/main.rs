@@ -63,6 +63,16 @@ async fn load_metadata(Path(tick): Path<String>) -> impl IntoResponse {
     content
 }
 
+async fn load_image(Path(tick): Path<String>) -> Result<Vec<u8>, StatusCode> {
+    match fs::read(format!("./{}/image_{}.png", UPLOADS_DIRECTORY, tick)).await {
+        Ok(content) => Ok(content),
+        Err(e) => {
+            println!("Error reading metadata page: Error: {}", e);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() {
     let cors_layer = CorsLayer::new()
@@ -71,9 +81,10 @@ async fn main() {
         .allow_headers([AUTHORIZATION, CONTENT_TYPE]); // Allow specific headers
 
     let app = Router::new()
-        .route("/store_image/{tick}", post(store_image))
-        .route("/store_metadata/{tick}", post(store_metadata))
+        .route("/image/{tick}", post(store_image))
+        .route("/metadata/{tick}", post(store_metadata))
         .route("/metadata/{tick}", get(load_metadata))
+        .route("/image/{tick}", get(load_image))
         .layer(cors_layer);
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
